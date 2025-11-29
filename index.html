@@ -699,7 +699,7 @@
             <div class="header">
                 <h1>日本語 Flashcards</h1>
                 <p>Estude japonês com flashcards interativos</p>
-                <small>versão 1.251129.1656</small>
+                <small>versão 1.251129.1802</small>
             </div>
 
             <!-- Initial State: Select Folder -->
@@ -720,6 +720,7 @@
                     <h2 style="font-size: 1.5rem; color: #34495e;">Decks</h2>
                     <div style="display: flex; gap: 10px;">
                         <button class="btn btn-primary" id="createNewDeckBtn">✨ Novo Deck</button>
+                        <button class="btn btn-outline" id="createFolderBtn">📁 Nova Pasta</button>
                         <button class="btn btn-outline" id="changeFolderBtn">📂 Mudar Pasta</button>
                     </div>
                 </div>
@@ -727,6 +728,8 @@
                     <select id="subfolderSelect" class="hidden"
                         style="padding:8px;border:1px solid #bdc3c7;border-radius:6px;">
                     </select>
+                    <button id="renameFolderBtn" class="btn btn-outline hidden" style="margin-left:8px;">✏️ Renomear</button>
+                    <button id="deleteFolderBtn" class="btn btn-outline hidden" style="margin-left:8px;">🗑️ Excluir</button>
                 </div>
                 <div id="deckList" class="deck-grid">
                     <!-- Decks will be injected here -->
@@ -877,6 +880,9 @@
         const selectFolderBtn = document.getElementById('selectFolderBtn');
         const changeFolderBtn = document.getElementById('changeFolderBtn');
         const createNewDeckBtn = document.getElementById('createNewDeckBtn');
+        const createFolderBtn = document.getElementById('createFolderBtn');
+        const renameFolderBtn = document.getElementById('renameFolderBtn');
+        const deleteFolderBtn = document.getElementById('deleteFolderBtn');
 
         const appContent = document.getElementById('appContent');
         // const uploadArea = document.getElementById('uploadArea'); // Removed
@@ -964,6 +970,26 @@
             showEditor();
         });
 
+        // Create a new subfolder inside the selected directory
+        createFolderBtn.addEventListener('click', async () => {
+            if (!dirHandle) {
+                alert('Por favor, selecione a pasta principal antes de criar subpastas.');
+                return;
+            }
+
+            const folderName = prompt('Nome da nova subpasta:');
+            if (!folderName) return;
+
+            try {
+                await dirHandle.getDirectoryHandle(folderName, { create: true });
+                await listDecks();
+                alert('Pasta criada: ' + folderName);
+            } catch (err) {
+                console.error('Erro criando pasta:', err);
+                alert('Erro ao criar pasta. Verifique permissões no navegador.');
+            }
+        });
+
         // Recursively collect .json files from a directory handle
         async function collectJsonFiles(dirHandle, prefix = '') {
             const files = [];
@@ -981,6 +1007,88 @@
                 console.error('Error collecting files from', prefix, err);
             }
             return files;
+        }
+
+        // Recursively collect all subfolder paths (even if empty)
+        async function collectFolders(dirHandle, prefix = '') {
+            const folders = [];
+            try {
+                for await (const entry of dirHandle.values()) {
+                    if (entry.kind === 'directory') {
+                        const folderPath = prefix + entry.name; // no trailing slash
+                        folders.push(folderPath);
+                        const sub = await collectFolders(entry, prefix + entry.name + '/');
+                        folders.push(...sub);
+                    }
+                }
+            } catch (err) {
+                console.error('Error collecting folders from', prefix, err);
+            }
+            return folders;
+        }
+
+        // Get directory handle by path (e.g. 'sub/inner')
+        async function getDirectoryHandleFromPath(root, path, opts = { create: false }) {
+            if (!path) return root;
+            const parts = path.split('/');
+            let handle = root;
+            for (const part of parts) {
+                handle = await handle.getDirectoryHandle(part, { create: !!opts.create });
+            }
+            return handle;
+        }
+
+        // Get parent directory handle and the last segment name
+        async function getParentHandleAndName(root, path) {
+            const parts = path.split('/');
+            const name = parts.pop();
+            const parentPath = parts.join('/');
+            const parentHandle = parentPath ? await getDirectoryHandleFromPath(root, parentPath) : root;
+            return { parentHandle, name };
+        }
+
+        // Copy directory contents recursively from srcHandle into destHandle
+        async function copyDirectory(srcHandle, destHandle) {
+            for await (const entry of srcHandle.values()) {
+                if (entry.kind === 'file') {
+                    try {
+                        const file = await entry.getFile();
+                        const writable = await (await destHandle.getFileHandle(entry.name, { create: true })).createWritable();
+                        await writable.write(await file.arrayBuffer());
+                        await writable.close();
+                    } catch (err) {
+                        // Some environments may not support getFileHandle/createWritable for new file; try an alternative
+                        try {
+                            const data = await (await entry.getFile()).arrayBuffer();
+                            const newFH = await destHandle.getFileHandle(entry.name, { create: true });
+                            const w = await newFH.createWritable();
+                            await w.write(data);
+                            await w.close();
+                        } catch (innerErr) {
+                            console.error('Error copying file', entry.name, innerErr);
+                            throw innerErr;
+                        }
+                    }
+                } else if (entry.kind === 'directory') {
+                    const newDir = await destHandle.getDirectoryHandle(entry.name, { create: true });
+                    await copyDirectory(entry, newDir);
+                }
+            }
+        }
+
+        // Attempt to remove a directory entry from its parent (uses removeEntry if available)
+        async function removeDirectory(parentHandle, name) {
+            if (parentHandle.removeEntry) {
+                try {
+                    await parentHandle.removeEntry(name, { recursive: true });
+                    return true;
+                } catch (err) {
+                    console.error('removeEntry failed', err);
+                    throw err;
+                }
+            } else {
+                throw new Error('removeEntry not supported by this browser');
+            }
         }
 
         // Render a list of file entries into the UI
@@ -1007,74 +1115,79 @@
 
             try {
                 const files = await collectJsonFiles(dirHandle);
+                const allFolders = await collectFolders(dirHandle);
 
                 // Sort by path
                 files.sort((a, b) => a.path.localeCompare(b.path));
+                allFolders.sort((a, b) => a.localeCompare(b));
 
-                if (files.length === 0) {
+                // Build folders list including root ('') and all discovered folders
+                const foldersSet = new Set();
+                // include root
+                foldersSet.add('');
+                allFolders.forEach(f => foldersSet.add(f));
+
+                const folders = Array.from(foldersSet).sort((a, b) => a.localeCompare(b));
+
+                // If no files and no subfolders, hide select and show message
+                if (files.length === 0 && allFolders.length === 0) {
                     deckList.innerHTML = '<p>Nenhum arquivo .json encontrado nesta pasta ou subpastas.</p>';
                     subfolderSelect.classList.add('hidden');
                     return;
                 }
 
-                // Build unique folder list (prefix before filename)
-                const foldersSet = new Set();
-                files.forEach(f => {
-                    const idx = f.path.lastIndexOf('/');
-                    const folder = idx === -1 ? '' : f.path.substring(0, idx);
-                    foldersSet.add(folder);
+                // Populate the subfolder select (show even empty subfolders)
+                subfolderSelect.classList.remove('hidden');
+                subfolderSelect.innerHTML = '';
+                const allOpt = document.createElement('option');
+                allOpt.value = '';
+                allOpt.textContent = 'Todas as pastas';
+                subfolderSelect.appendChild(allOpt);
+
+                // Root option
+                const rootOpt = document.createElement('option');
+                rootOpt.value = '__ROOT__';
+                rootOpt.textContent = 'Pasta principal';
+                subfolderSelect.appendChild(rootOpt);
+
+                folders.forEach(folder => {
+                    if (folder === '') return; // root already handled
+                    const opt = document.createElement('option');
+                    opt.value = folder;
+                    opt.textContent = folder;
+                    subfolderSelect.appendChild(opt);
                 });
 
-                const folders = Array.from(foldersSet).sort((a, b) => a.localeCompare(b));
-
-                // Populate or hide the subfolder select
-                if (folders.length <= 1 && folders[0] === '') {
-                    subfolderSelect.classList.add('hidden');
-                } else {
-                    subfolderSelect.classList.remove('hidden');
-                    // Clear existing options
-                    subfolderSelect.innerHTML = '';
-                    const allOpt = document.createElement('option');
-                    allOpt.value = '';
-                    allOpt.textContent = 'Todas as pastas';
-                    subfolderSelect.appendChild(allOpt);
-
-                    // Add root folder option if there are files in root
-                    if (folders.includes('')) {
-                        const rootOpt = document.createElement('option');
-                        rootOpt.value = '__ROOT__';
-                        rootOpt.textContent = 'Pasta principal';
-                        subfolderSelect.appendChild(rootOpt);
+                // Filter handler + update folder action buttons
+                subfolderSelect.onchange = async () => {
+                    const sel = subfolderSelect.value;
+                    if (!sel) {
+                        // Show all
+                        renderFileEntries(files);
+                        renameFolderBtn.classList.add('hidden');
+                        deleteFolderBtn.classList.add('hidden');
+                    } else if (sel === '__ROOT__') {
+                        // Show only root files (no '/' in path)
+                        const filtered = files.filter(f => !f.path.includes('/'));
+                        renderFileEntries(filtered);
+                        // Root cannot be renamed/deleted
+                        renameFolderBtn.classList.add('hidden');
+                        deleteFolderBtn.classList.add('hidden');
+                    } else {
+                        // Show only files in selected subfolder
+                        const filtered = files.filter(f => f.path.startsWith(sel + '/'));
+                        renderFileEntries(filtered);
+                        // Enable rename/delete buttons
+                        renameFolderBtn.classList.remove('hidden');
+                        deleteFolderBtn.classList.remove('hidden');
                     }
+                };
 
-                    folders.forEach(folder => {
-                        if (folder === '') return; // root handled separately
-                        const opt = document.createElement('option');
-                        opt.value = folder;
-                        opt.textContent = folder;
-                        subfolderSelect.appendChild(opt);
-                    });
-
-                    // Filter handler
-                    subfolderSelect.onchange = () => {
-                        const sel = subfolderSelect.value;
-                        if (!sel) {
-                            // Show all
-                            renderFileEntries(files);
-                        } else if (sel === '__ROOT__') {
-                            // Show only root files (no '/' in path)
-                            const filtered = files.filter(f => !f.path.includes('/'));
-                            renderFileEntries(filtered);
-                        } else {
-                            // Show only files in selected subfolder
-                            const filtered = files.filter(f => f.path.startsWith(sel + '/'));
-                            renderFileEntries(filtered);
-                        }
-                    };
-                }
-
-                // Initial render
+                // Initial render (default: all files)
                 renderFileEntries(files);
+                // Initialize folder buttons state
+                renameFolderBtn.classList.add('hidden');
+                deleteFolderBtn.classList.add('hidden');
             } catch (err) {
                 console.error('Error listing decks:', err);
                 deckList.innerHTML = '<p>Erro ao listar arquivos.</p>';
@@ -1416,12 +1529,76 @@
                 await writable.close();
 
                 alert('Deck salvo com sucesso!');
+                
+                // Refresh deck list after saving
+                if (dirHandle) {
+                    await listDecks();
+                }
+                
                 hideEditor();
             } catch (err) {
                 console.error('Error saving deck:', err);
                 if (err.name !== 'AbortError') {
                     alert('Erro ao salvar o deck.');
                 }
+            }
+        });
+
+        // Rename selected folder
+        renameFolderBtn.addEventListener('click', async () => {
+            const sel = document.getElementById('subfolderSelect').value;
+            if (!sel || sel === '__ROOT__') return;
+
+            const newName = prompt('Novo nome para a pasta:', sel.split('/').pop());
+            if (!newName) return;
+
+            try {
+                const { parentHandle, name } = await getParentHandleAndName(dirHandle, sel);
+                // Check if newName already exists in parent
+                try {
+                    await parentHandle.getDirectoryHandle(newName);
+                    alert('Já existe uma pasta com esse nome no mesmo nível. Escolha outro nome.');
+                    return;
+                } catch (e) {
+                    // expected when doesn't exist
+                }
+
+                const srcHandle = await parentHandle.getDirectoryHandle(name);
+                const destHandle = await parentHandle.getDirectoryHandle(newName, { create: true });
+
+                await copyDirectory(srcHandle, destHandle);
+
+                // remove source
+                try {
+                    await removeDirectory(parentHandle, name);
+                } catch (err) {
+                    console.warn('Could not remove original folder after renaming:', err);
+                    alert('Pasta copiada, mas não foi possível remover a pasta antiga automaticamente. Remova manualmente se desejar.');
+                }
+
+                await listDecks();
+                alert('Pasta renomeada para ' + newName);
+            } catch (err) {
+                console.error('Error renaming folder:', err);
+                alert('Erro ao renomear pasta. Verifique permissões no navegador.');
+            }
+        });
+
+        // Delete selected folder
+        deleteFolderBtn.addEventListener('click', async () => {
+            const sel = document.getElementById('subfolderSelect').value;
+            if (!sel || sel === '__ROOT__') return;
+
+            if (!confirm('Tem certeza que deseja excluir a pasta "' + sel + '" e todo o seu conteúdo?')) return;
+
+            try {
+                const { parentHandle, name } = await getParentHandleAndName(dirHandle, sel);
+                await removeDirectory(parentHandle, name);
+                await listDecks();
+                alert('Pasta excluída: ' + sel);
+            } catch (err) {
+                console.error('Error deleting folder:', err);
+                alert('Erro ao excluir pasta. Talvez o navegador não suporte remoção programática.');
             }
         });
     </script>
