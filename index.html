@@ -699,7 +699,7 @@
             <div class="header">
                 <h1>日本語 Flashcards</h1>
                 <p>Estude japonês com flashcards interativos</p>
-                <small>versão 1.251129.1609</small>
+                <small>versão 1.251129.1656</small>
             </div>
 
             <!-- Initial State: Select Folder -->
@@ -718,12 +718,20 @@
                 <div class="deck-list-header"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2 style="font-size: 1.5rem; color: #34495e;">Decks</h2>
-                    <button class="btn btn-primary" id="createNewDeckBtn">✨ Novo Deck</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" id="createNewDeckBtn">✨ Novo Deck</button>
+                        <button class="btn btn-outline" id="changeFolderBtn">📂 Mudar Pasta</button>
+                    </div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <select id="subfolderSelect" class="hidden"
+                        style="padding:8px;border:1px solid #bdc3c7;border-radius:6px;">
+                    </select>
                 </div>
                 <div id="deckList" class="deck-grid">
                     <!-- Decks will be injected here -->
                 </div>
-                <button class="btn btn-outline" id="changeFolderBtn" style="margin-top: 20px;">📂 Mudar Pasta</button>
+
             </div>
         </div>
 
@@ -975,9 +983,27 @@
             return files;
         }
 
-        // List decks including those inside subfolders
+        // Render a list of file entries into the UI
+        function renderFileEntries(fileEntries) {
+            deckList.innerHTML = '';
+            for (const fileEntry of fileEntries) {
+                const card = document.createElement('div');
+                card.className = 'deck-item';
+                card.innerHTML = `
+                    <div>
+                        <div class="deck-item-title">${fileEntry.path}</div>
+                        <div class="deck-item-info">Clique para abrir</div>
+                    </div>
+                `;
+                card.onclick = () => loadDeckFromFile(fileEntry.handle);
+                deckList.appendChild(card);
+            }
+        }
+
+        // List decks including those inside subfolders and provide a subfolder select
         async function listDecks() {
             deckList.innerHTML = '<p>Carregando decks...</p>';
+            const subfolderSelect = document.getElementById('subfolderSelect');
 
             try {
                 const files = await collectJsonFiles(dirHandle);
@@ -985,27 +1011,74 @@
                 // Sort by path
                 files.sort((a, b) => a.path.localeCompare(b.path));
 
-                deckList.innerHTML = '';
                 if (files.length === 0) {
                     deckList.innerHTML = '<p>Nenhum arquivo .json encontrado nesta pasta ou subpastas.</p>';
+                    subfolderSelect.classList.add('hidden');
                     return;
                 }
 
-                for (const fileEntry of files) {
-                    const card = document.createElement('div');
-                    card.className = 'deck-item';
-                    card.innerHTML = `
-                        <div>
-                            <div class="deck-item-title">${fileEntry.path}</div>
-                            <div class="deck-item-info">Clique para abrir</div>
-                        </div>
-                    `;
-                    card.onclick = () => loadDeckFromFile(fileEntry.handle);
-                    deckList.appendChild(card);
+                // Build unique folder list (prefix before filename)
+                const foldersSet = new Set();
+                files.forEach(f => {
+                    const idx = f.path.lastIndexOf('/');
+                    const folder = idx === -1 ? '' : f.path.substring(0, idx);
+                    foldersSet.add(folder);
+                });
+
+                const folders = Array.from(foldersSet).sort((a, b) => a.localeCompare(b));
+
+                // Populate or hide the subfolder select
+                if (folders.length <= 1 && folders[0] === '') {
+                    subfolderSelect.classList.add('hidden');
+                } else {
+                    subfolderSelect.classList.remove('hidden');
+                    // Clear existing options
+                    subfolderSelect.innerHTML = '';
+                    const allOpt = document.createElement('option');
+                    allOpt.value = '';
+                    allOpt.textContent = 'Todas as pastas';
+                    subfolderSelect.appendChild(allOpt);
+
+                    // Add root folder option if there are files in root
+                    if (folders.includes('')) {
+                        const rootOpt = document.createElement('option');
+                        rootOpt.value = '__ROOT__';
+                        rootOpt.textContent = 'Pasta principal';
+                        subfolderSelect.appendChild(rootOpt);
+                    }
+
+                    folders.forEach(folder => {
+                        if (folder === '') return; // root handled separately
+                        const opt = document.createElement('option');
+                        opt.value = folder;
+                        opt.textContent = folder;
+                        subfolderSelect.appendChild(opt);
+                    });
+
+                    // Filter handler
+                    subfolderSelect.onchange = () => {
+                        const sel = subfolderSelect.value;
+                        if (!sel) {
+                            // Show all
+                            renderFileEntries(files);
+                        } else if (sel === '__ROOT__') {
+                            // Show only root files (no '/' in path)
+                            const filtered = files.filter(f => !f.path.includes('/'));
+                            renderFileEntries(filtered);
+                        } else {
+                            // Show only files in selected subfolder
+                            const filtered = files.filter(f => f.path.startsWith(sel + '/'));
+                            renderFileEntries(filtered);
+                        }
+                    };
                 }
+
+                // Initial render
+                renderFileEntries(files);
             } catch (err) {
                 console.error('Error listing decks:', err);
                 deckList.innerHTML = '<p>Erro ao listar arquivos.</p>';
+                subfolderSelect.classList.add('hidden');
             }
         }
 
