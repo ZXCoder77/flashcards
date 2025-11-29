@@ -1,0 +1,65 @@
+{
+  "title": "Vocabulário Módulo 3 - Frases de Exemplo",
+  "cards": [
+    {
+      "side1": "私はコーヒーを飲みます",
+      "side2": "わたし は コーヒー を のみます",
+      "side3": "watashi wa kōhī o nomimasu",
+      "side4": "Eu bebo café"
+    },
+    {
+      "side1": "鍵はどこですか",
+      "side2": "かぎ は どこ です か",
+      "side3": "kagi wa doko desu ka",
+      "side4": "Onde está a chave?"
+    },
+    {
+      "side1": "本屋で本を買いました",
+      "side2": "ほんや で ほん を かいました",
+      "side3": "hon'ya de hon o kaimashita",
+      "side4": "Comprei um livro na livraria"
+    },
+    {
+      "side1": "日本語の先生です",
+      "side2": "にほんご の せんせい です",
+      "side3": "nihongo no sensei desu",
+      "side4": "É professor(a) de japonês"
+    },
+    {
+      "side1": "新しい車です",
+      "side2": "あたらし くるま です",
+      "side3": "atarashii kuruma desu",
+      "side4": "É um carro novo"
+    },
+    {
+      "side1": "新聞を読みます",
+      "side2": "しんぶん を よみます",
+      "side3": "shinbun o yomimasu",
+      "side4": "Leio o jornal"
+    },
+    {
+      "side1": "日曜日に掃除をします",
+      "side2": "にちようび に そうじ を します",
+      "side3": "nichiyōbi ni sōji o shimasu",
+      "side4": "Faço a limpeza no domingo"
+    },
+    {
+      "side1": "喫茶店に行きます",
+      "side2": "きっさてん に いきます",
+      "side3": "kissaten ni ikimasu",
+      "side4": "Vou à cafeteria (casa de chá)"
+    },
+    {
+      "side1": "今日のランチはスパゲッティです",
+      "side2": "きょう の ランチ は スパゲッティ です",
+      "side3": "kyō no ranchi wa supagetti desu",
+      "side4": "O almoço de hoje é espaguete"
+    },
+    {
+      "side1": "辞書を使います",
+      "side2": "じしょ を つかいます",
+      "side3": "jisho o tsukaimasu",
+      "side4": "Uso o dicionário"
+    }
+  ]
+}

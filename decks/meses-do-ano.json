@@ -1,0 +1,77 @@
+{
+    "title": "Meses do Ano",
+    "cards": [
+        {
+            "side1": "一月",
+            "side2": "いちがつ",
+            "side3": "Ichigatsu",
+            "side4": "Janeiro"
+        },
+        {
+            "side1": "二月",
+            "side2": "にがつ",
+            "side3": "Nigatsu",
+            "side4": "Fevereiro"
+        },
+        {
+            "side1": "三月",
+            "side2": "さんがつ",
+            "side3": "Sangatsu",
+            "side4": "Março"
+        },
+        {
+            "side1": "四月",
+            "side2": "しがつ",
+            "side3": "Shigatsu",
+            "side4": "Abril"
+        },
+        {
+            "side1": "五月",
+            "side2": "ごがつ",
+            "side3": "Gogatsu",
+            "side4": "Maio"
+        },
+        {
+            "side1": "六月",
+            "side2": "ろくがつ",
+            "side3": "Rokugatsu",
+            "side4": "Junho"
+        },
+        {
+            "side1": "七月",
+            "side2": "しちがつ",
+            "side3": "Shichigatsu",
+            "side4": "Julho"
+        },
+        {
+            "side1": "八月",
+            "side2": "はちがつ",
+            "side3": "Hachigatsu",
+            "side4": "Agosto"
+        },
+        {
+            "side1": "九月",
+            "side2": "くがつ",
+            "side3": "Kugatsu",
+            "side4": "Setembro"
+        },
+        {
+            "side1": "十月",
+            "side2": "じゅうがつ",
+            "side3": "Juugatsu",
+            "side4": "Outubro"
+        },
+        {
+            "side1": "十一月",
+            "side2": "じゅういちがつ",
+            "side3": "Juuichigatsu",
+            "side4": "Novembro"
+        },
+        {
+            "side1": "十二月",
+            "side2": "じゅうにがつ",
+            "side3": "Juunigatsu",
+            "side4": "Dezembro"
+        }
+    ]
+}

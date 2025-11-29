@@ -1,0 +1,179 @@
+{
+  "title": "Módulo 3 Completo - Todos os Verbos e Expressões",
+  "cards": [
+    {
+      "side1": "車を買いましょう",
+      "side2": "くるま を かいましょう",
+      "side3": "kuruma o kaimashō",
+      "side4": "Vamos comprar um carro"
+    },
+    {
+      "side1": "辞書を買いました",
+      "side2": "じしょ を かいました",
+      "side3": "jisho o kaimashita",
+      "side4": "Comprei um dicionário"
+    },
+    {
+      "side1": "パンを買います",
+      "side2": "パン を かいます",
+      "side3": "pan o kaimasu",
+      "side4": "Compro pão"
+    },
+    {
+      "side1": "ご飯を食べます",
+      "side2": "ごはん を たべます",
+      "side3": "gohan o tabemasu",
+      "side4": "Como arroz / refeição"
+    },
+    {
+      "side1": "かきを食べました",
+      "side2": "かき を たべました",
+      "side3": "kaki o tabemashita",
+      "side4": "Comi caqui"
+    },
+    {
+      "side1": "肉を食べません",
+      "side2": "にく を たべません",
+      "side3": "niku o tabemasen",
+      "side4": "Não como carne"
+    },
+    {
+      "side1": "寿司を食べる",
+      "side2": "すし を たべる",
+      "side3": "sushi o taberu",
+      "side4": "Comer sushi"
+    },
+    {
+      "side1": "日本語を習いましょう",
+      "side2": "にほんご を ならいましょう",
+      "side3": "nihongo o naraimashō",
+      "side4": "Vamos aprender japonês"
+    },
+    {
+      "side1": "チェスを習いました",
+      "side2": "チェス を ならいました",
+      "side3": "chesu o naraimashita",
+      "side4": "Aprendi xadrez"
+    },
+    {
+      "side1": "ウォッカを飲みます",
+      "side2": "ウォッカ を のみます",
+      "side3": "wokka o nomimasu",
+      "side4": "Bebo vodka"
+    },
+    {
+      "side1": "新聞を読みます",
+      "side2": "しんぶん を よみます",
+      "side3": "shinbun o yomimasu",
+      "side4": "Leio jornal"
+    },
+    {
+      "side1": "本を読みません",
+      "side2": "ほん を よみません",
+      "side3": "hon o yomimasen",
+      "side4": "Não leio livros"
+    },
+    {
+      "side1": "本を読む",
+      "side2": "ほん を よむ",
+      "side3": "hon o yomu",
+      "side4": "Ler livro"
+    },
+    {
+      "side1": "ありがとうございます",
+      "side2": "ありがとうございます",
+      "side3": "arigatōgozaimasu",
+      "side4": "Obrigado"
+    },
+    {
+      "side1": "おはようございます",
+      "side2": "おはようございます",
+      "side3": "ohayōgozaimasu",
+      "side4": "Bom dia"
+    },
+    {
+      "side1": "おやすみなさい",
+      "side2": "おやすみなさい",
+      "side3": "oyasuminasai",
+      "side4": "Bom descanso"
+    },
+    {
+      "side1": "ごめんなさい",
+      "side2": "ごめんなさい",
+      "side3": "gomennasai",
+      "side4": "Desculpe"
+    },
+    {
+      "side1": "こんにちは",
+      "side2": "こんにちは",
+      "side3": "konnichiwa",
+      "side4": "Boa tarde / Como vai?"
+    },
+    {
+      "side1": "こんばんは",
+      "side2": "こんばんは",
+      "side3": "konbanwa",
+      "side4": "Boa noite"
+    },
+    {
+      "side1": "さようなら",
+      "side2": "さようなら",
+      "side3": "sayonara",
+      "side4": "Adeus / Até logo"
+    },
+    {
+      "side1": "すみません",
+      "side2": "すみません",
+      "side3": "sumimasen",
+      "side4": "Desculpe / Com licença / Por favor"
+    },
+    {
+      "side1": "次の授業でお会いしましょう",
+      "side2": "つぎ の じゅぎょう で おあいしましょう",
+      "side3": "tsugi-no jugyō-de oaishimashō",
+      "side4": "Vamos nos encontrar na próxima aula"
+    },
+    {
+      "side1": "次のビデオでお会いしましょう",
+      "side2": "つぎ の ビデオ で おあいしましょう",
+      "side3": "tsugi-no bideo-de oaishimashō",
+      "side4": "Vamos nos encontrar no próximo vídeo"
+    },
+    {
+      "side1": "では",
+      "side2": "では",
+      "side3": "dewa",
+      "side4": "Então"
+    },
+    {
+      "side1": "どうぞ",
+      "side2": "どうぞ",
+      "side3": "dōzo",
+      "side4": "Por favor (ao oferecer algo)"
+    },
+    {
+      "side1": "どうも",
+      "side2": "どうも",
+      "side3": "dōmo",
+      "side4": "Obrigado (informal)"
+    },
+    {
+      "side1": "はじめまして",
+      "side2": "はじめまして",
+      "side3": "hajimemashite",
+      "side4": "Muito prazer"
+    },
+    {
+      "side1": "やっと",
+      "side2": "やっと",
+      "side3": "yatto",
+      "side4": "Finalmente"
+    },
+    {
+      "side1": "よろしくおねがいします",
+      "side2": "よろしく おねがいします",
+      "side3": "yoroshiku onegaishimasu",
+      "side4": "Conto com sua atenção / seus préstimos"
+    }
+  ]
+}

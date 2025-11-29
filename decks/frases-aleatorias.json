@@ -1,0 +1,95 @@
+{
+  "title": "Frases Aleatórias",
+  "cards": [
+    {
+      "side1": "私は寿司をたべます",
+      "side2": "わたし は すし を たべます",
+      "side3": "watashi wa sushi o tabemasu",
+      "side4": "Eu como sushi."
+    },
+    {
+      "side1": "新しい車を買いました",
+      "side2": "あたらし くるま を かいました",
+      "side3": "atarashii kuruma o kaimashita",
+      "side4": "Comprei um carro novo"
+    },
+    {
+      "side1": "私は日本に行きたいです",
+      "side2": "わたし は にほん に いきたい です",
+      "side3": "watashi wa nihon ni ikitai desu",
+      "side4": "Quero ir para o Japão"
+    },
+    {
+      "side1": "こんにちは、アランです。初めまして。",
+      "side2": "こんにちは、アラン です。はじめまして。",
+      "side3": "Kon'nichiwa, Arandesu. Hajimemashite.",
+      "side4": "Olá, eu sou alan. Prazer em conhecê-lo."
+    },
+    {
+      "side1": "土曜日はショッピングモールに寿司を食べに行きます。",
+      "side2": "どようび は ショッピングモール に 寿司 を 食べに行きます。",
+      "side3": "Doyōbi wa shoppingumōru ni sushi o tabe ni ikimasu",
+      "side4": "No sábado vou no shopping comer sushi."
+    },
+    {
+      "side1": "マリアナさん、日本にいっしょに行きたいですか",
+      "side2": "マリアナさん、にほん に いっしょ に いきたい です か",
+      "side3": "mariana san, nihon ni issho ni ikitai desu ka?",
+      "side4": "Mariana, você quer ir ao Japão junto comigo?"
+    },
+    {
+      "side1": "マリアナさん、日本に私と行きたいですか",
+      "side2": "マリアナさん、にほん に わたし と いきたい です か",
+      "side3": "mariana san, nihon ni watashi to ikitai desu ka?",
+      "side4": "Mariana, você quer ir ao Japão comigo?"
+    },
+    {
+      "side1": "ここは私の家です",
+      "side2": "ここ は わたし の いえ です",
+      "side3": "Koko wa watashi no ie desu",
+      "side4": "Aqui é minha casa"
+    },
+    {
+      "side1": "あなたは何を食べたいですか",
+      "side2": "あなた は なに を たべたい です か",
+      "side3": "Anata wa nani o tabetai desu ka?",
+      "side4": "O que você quer comer?"
+    },
+    {
+      "side1": "あなたは犬が好きですか",
+      "side2": "あなた は いぬ が すき です か",
+      "side3": "Anata wa inu ga suki desu ka?",
+      "side4": "Você gosta de cachorro?"
+    },
+    {
+      "side1": "私はビデオゲームをすることとアニメを見ることが好きです",
+      "side2": "わたし は  びでおげーむ を する こと と あにめ を みる こと が すき です",
+      "side3": "Watashi wa bideogēmu o suru koto to anime o miru koto ga suki desu",
+      "side4": "Eu gosto de jogar videogame e assistir anime."
+    },
+    {
+      "side1": "今日は暑いです",
+      "side2": "きょう は あつい です",
+      "side3": "Kyō wa atsui desu",
+      "side4": "Hoje está quente."
+    },
+    {
+      "side1": "その車はいくらですか",
+      "side2": "その くるま は いくら です か",
+      "side3": "Sono kuruma wa ikura desu ka?",
+      "side4": "Quanto custa esse carro?"
+    },
+    {
+      "side1": "レストランはどこですか",
+      "side2": "レストラン は どこ です か",
+      "side3": "Resutoran wa doko desu ka?",
+      "side4": "Onde fica o restaurante?"
+    },
+    {
+      "side1": "これは何ですか",
+      "side2": "これ は なん です か",
+      "side3": "Kore wa nan desu ka",
+      "side4": "O que é isso?"
+    }
+  ]
+}

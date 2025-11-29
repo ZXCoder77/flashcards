@@ -1,0 +1,17 @@
+{
+    "title": "Deck de exemplo",
+    "cards": [
+        {
+            "side1": "私は寿司をたべます",
+            "side2": "わたし は すし を たべます",
+            "side3": "watashi wa sushi o tabemasu",
+            "side4": "Eu como sushi"
+        },
+        {
+            "side1": "新しい車を買いました",
+            "side2": "あたらし くるま を かいました",
+            "side3": "atarashii kuruma o kaimashita",
+            "side4": "Comprei um carro novo"
+        }
+    ]
+}

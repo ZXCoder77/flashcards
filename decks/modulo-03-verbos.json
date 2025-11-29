@@ -1,0 +1,65 @@
+{
+  "title": "Verbos e Expressões Módulo 3",
+  "cards": [
+    {
+      "side1": "パンを買いましょう",
+      "side2": "パン を かいましょう",
+      "side3": "pan o kaimashō",
+      "side4": "Vamos comprar pão"
+    },
+    {
+      "side1": "寿司を食べました",
+      "side2": "すし を たべました",
+      "side3": "sushi o tabemashita",
+      "side4": "Comi sushi"
+    },
+    {
+      "side1": "コーヒーを飲みます",
+      "side2": "コーヒー を のみます",
+      "side3": "kōhī o nomimasu",
+      "side4": "Bebo café"
+    },
+    {
+      "side1": "雑誌を読みません",
+      "side2": "ざっし を よみません",
+      "side3": "zasshi o yomimasen",
+      "side4": "Não leio revistas"
+    },
+    {
+      "side1": "日本語を習いましょう",
+      "side2": "にほんご を ならいましょう",
+      "side3": "nihongo o naraimashō",
+      "side4": "Vamos aprender japonês"
+    },
+    {
+      "side1": "次の授業でお会いしましょう",
+      "side2": "つぎ の じゅぎょう で おあいしましょう",
+      "side3": "tsugi no jugyō de oaishimashō",
+      "side4": "Vamos nos encontrar na próxima aula"
+    },
+    {
+      "side1": "おはようございます",
+      "side2": "おはようございます",
+      "side3": "ohayōgozaimasu",
+      "side4": "Bom dia"
+    },
+    {
+      "side1": "すみません",
+      "side2": "すみません",
+      "side3": "sumimasen",
+      "side4": "Desculpe / Com licença"
+    },
+    {
+      "side1": "はじめまして",
+      "side2": "はじめまして",
+      "side3": "hajimemashite",
+      "side4": "Muito prazer"
+    },
+    {
+      "side1": "よろしくおねがいします",
+      "side2": "よろしく おねがいします",
+      "side3": "yoroshiku onegaishimasu",
+      "side4": "Conto com sua atenção / seus préstimos"
+    }
+  ]
+}

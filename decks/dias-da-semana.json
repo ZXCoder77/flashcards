@@ -1,0 +1,47 @@
+{
+    "title": "Dias da Semana",
+    "cards": [
+        {
+            "side1": "月曜日",
+            "side2": "げつようび",
+            "side3": "Getsuyoubi",
+            "side4": "Segunda-feira"
+        },
+        {
+            "side1": "火曜日",
+            "side2": "かようび",
+            "side3": "Kayoubi",
+            "side4": "Terça-feira"
+        },
+        {
+            "side1": "水曜日",
+            "side2": "すいようび",
+            "side3": "Suiyoubi",
+            "side4": "Quarta-feira"
+        },
+        {
+            "side1": "木曜日",
+            "side2": "もくようび",
+            "side3": "Mokuyoubi",
+            "side4": "Quinta-feira"
+        },
+        {
+            "side1": "金曜日",
+            "side2": "きんようび",
+            "side3": "Kinyoubi",
+            "side4": "Sexta-feira"
+        },
+        {
+            "side1": "土曜日",
+            "side2": "どようび",
+            "side3": "Doyoubi",
+            "side4": "Sábado"
+        },
+        {
+            "side1": "日曜日",
+            "side2": "にちようび",
+            "side3": "Nichiyoubi",
+            "side4": "Domingo"
+        }
+    ]
+}

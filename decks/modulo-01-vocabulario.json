@@ -1,0 +1,341 @@
+{
+  "title": "Módulo 01 Vocabulário",
+  "cards": [
+    {
+      "side1": "一本を取る",
+      "side2": "いっぽん を とる",
+      "side3": "Ippon o toru",
+      "side4": "Conseguir um golpe vencedor (ippon)"
+    },
+    {
+      "side1": "お茶を飲みます",
+      "side2": "おちゃ を のみます",
+      "side3": "Ocha o nomimasu",
+      "side4": "Eu tomo chá"
+    },
+    {
+      "side1": "この傘は私のです。",
+      "side2": "この かさ は わたし の です。",
+      "side3": "Kono kasa wa watashi no desu.",
+      "side4": "Este guarda-chuva é meu."
+    },
+    {
+      "side1": "漢字は難しいです。",
+      "side2": "かんじ は むずかしい です。",
+      "side3": "Kanji wa muzukashii desu.",
+      "side4": "Kanji é difícil."
+    },
+    {
+      "side1": "乾杯しましょう！",
+      "side2": "かんぱい しましょう！",
+      "side3": "Kanpai shimashou!",
+      "side4": "Vamos brindar! (Saúde!)"
+    },
+    {
+      "side1": "基礎を学びます。",
+      "side2": "きそ を まなびます。",
+      "side3": "Kiso o manabimasu.",
+      "side4": "Eu aprendo a base."
+    },
+    {
+      "side1": "切手を貼ります。",
+      "side2": "きって を はります。",
+      "side3": "Kitte o harimasu.",
+      "side4": "Vou colar o selo."
+    },
+    {
+      "side1": "玄米を食べます。",
+      "side2": "げんまい を たべます。",
+      "side3": "Genmai o tabemasu.",
+      "side4": "Eu como arroz integral."
+    },
+    {
+      "side1": "日本の国花は何ですか？",
+      "side2": "にっぽん の こっか は なん です か？",
+      "side3": "Nippon no kokka wa nan desu ka?",
+      "side4": "Qual é a flor nacional do Japão?"
+    },
+    {
+      "side1": "コンビニに行きます。",
+      "side2": "コンビニ に いきます。",
+      "side3": "Konbini ni ikimasu.",
+      "side4": "Eu vou à loja de conveniência."
+    },
+    {
+      "side1": "桜が綺麗です。",
+      "side2": "さくら が きれい です。",
+      "side3": "Sakura ga kirei desu.",
+      "side4": "A cerejeira é bonita."
+    },
+    {
+      "side1": "好きな作家がいます。",
+      "side2": "すき な さっか が います.",
+      "side3": "Suki na sakka ga imasu.",
+      "side4": "Há um escritor que eu gosto."
+    },
+    {
+      "side1": "椎茸は美味しいです。",
+      "side2": "しいたけ は おいしい です",
+      "side3": "Shiitake wa oishii desu.",
+      "side4": "Shiitake é saboroso."
+    },
+    {
+      "side1": "しめじを買います。",
+      "side2": "しめじ を かいます",
+      "side3": "Shimeji o kaimasu.",
+      "side4": "Eu compro shimeji."
+    },
+    {
+      "side1": "写真を撮ります。",
+      "side2": "しゃしん を とります",
+      "side3": "Shashin o torimasu.",
+      "side4": "Eu tiro uma foto."
+    },
+    {
+      "side1": "ジャムを塗ります。",
+      "side2": "ジャム を ぬります",
+      "side3": "Jamu o nurimasu.",
+      "side4": "Eu espalho a geleia."
+    },
+    {
+      "side1": "一週間休みます。",
+      "side2": "いっしゅうかん やすみます。",
+      "side3": "Isshuukan yasumimasu.",
+      "side4": "Eu descanso por uma semana."
+    },
+    {
+      "side1": "彼は十歳です。",
+      "side2": "かれ は じゅっさい です",
+      "side3": "Kare wa jussai desu.",
+      "side4": "Ele tem 10 anos de idade."
+    },
+    {
+      "side1": "順番を守ります。",
+      "side2": "じゅんばん を まもります",
+      "side3": "Junban o mamorimasu.",
+      "side4": "Eu respeito a ordem/sequência."
+    },
+    {
+      "side1": "寿司を食べました。",
+      "side2": "すし を たべました",
+      "side3": "Sushi o tabemashita.",
+      "side4": "Eu comi sushi."
+    },
+    {
+      "side1": "私の父は医者です。",
+      "side2": "わたしのちちはいしゃです",
+      "side3": "Watashi no chichi wa isha desu.",
+      "side4": "Meu pai é médico."
+    },
+    {
+      "side1": "中間試験があります。",
+      "side2": "ちゅうかんしけんがあります",
+      "side3": "Chuukan shiken ga arimasu.",
+      "side4": "Há uma prova intermediária."
+    },
+    {
+      "side1": "私が長男です。",
+      "side2": "わたし が ちょうなん です。",
+      "side3": "Watashi ga chounan desu.",
+      "side4": "Eu sou o primogênito."
+    },
+    {
+      "side1": "津波が怖いです。",
+      "side2": "つなみがこわいです",
+      "side3": "Tsunami ga kowai desu.",
+      "side4": "Tsunami é assustador."
+    },
+    {
+      "side1": "日産車が好きです。",
+      "side2": "にっさんしゃがすきです。",
+      "side3": "Nissan sha ga suki desu.",
+      "side4": "Eu gosto de carros Nissan."
+    },
+    {
+      "side1": "にゃんこは可愛いです。",
+      "side2": "にゃんこはかわいいです",
+      "side3": "Nyanko wa kawaii desu.",
+      "side4": "Gato (nyanko) é fofo."
+    },
+    {
+      "side1": "入門書を読みます。",
+      "side2": "にゅうもんしょをよみます。",
+      "side3": "Nyuumonsho o yomimasu.",
+      "side4": "Eu leio um livro de introdução."
+    },
+    {
+      "side1": "如来の像を見ました。",
+      "side2": "にょらいのぞうをみました",
+      "side3": "Nyorai no zou o mimashita.",
+      "side4": "Eu vi uma estátua de Nyôrai."
+    },
+    {
+      "side1": "美しい花ですね。",
+      "side2": "うつくしいはなですね。",
+      "side3": "Utsukushii hana desu ne.",
+      "side4": "É uma flor bonita, não é?"
+    },
+    {
+      "side1": "ヒーローが助けました。",
+      "side2": "ヒーローがたすけました。",
+      "side3": "Hīrō ga tasukemashita.",
+      "side4": "O herói ajudou."
+    },
+    {
+      "side1": "広島に行きたいです。",
+      "side2": "ひろしまにいきたいです。",
+      "side3": "Hiroshima ni ikitai desu.",
+      "side4": "Eu quero ir a Hiroshima."
+    },
+    {
+      "side1": "ブラジルは遠いです。",
+      "side2": "ブラジルはとおいです。",
+      "side3": "Burajiru wa tooi desu.",
+      "side4": "O Brasil é longe."
+    },
+    {
+      "side1": "ベッドで寝ます。",
+      "side2": "ベッドでねます。",
+      "side3": "Beddo de nemasu.",
+      "side4": "Eu durmo na cama."
+    },
+    {
+      "side1": "自分の部屋があります。",
+      "side2": "じぶんのへやがあります。",
+      "side3": "Jibun no heya ga arimasu.",
+      "side4": "Eu tenho meu próprio quarto."
+    },
+    {
+      "side1": "ほうきを使います。",
+      "side2": "ほうきをつかいます。",
+      "side3": "Houki o tsukaimasu.",
+      "side4": "Eu uso a vassoura."
+    },
+    {
+      "side1": "ホテルを予約します。",
+      "side2": "ホテルをよやくします。",
+      "side3": "Hoteru o yoyaku shimasu.",
+      "side4": "Eu reservo um hotel."
+    },
+    {
+      "side1": "丸を描きます。",
+      "side2": "まるをかきます。",
+      "side3": "Maru o kakimasu.",
+      "side4": "Eu desenho um círculo."
+    },
+    {
+      "side1": "マンガが好きです。",
+      "side2": "マンガがすきです。",
+      "side3": "Manga ga suki desu.",
+      "side4": "Eu gosto de mangá."
+    },
+    {
+      "side1": "右に曲がります。",
+      "side2": "みぎにまがります。",
+      "side3": "Migi ni magarimasu.",
+      "side4": "Eu viro à direita."
+    },
+    {
+      "side1": "未来はどうなる？",
+      "side2": "みらいはどうなる？",
+      "side3": "Mirai wa dou naru?",
+      "side4": "O que acontecerá com o futuro?"
+    },
+    {
+      "side1": "私の娘は学生です。",
+      "side2": "わたしのむすめはがくせいです",
+      "side3": "Watashi no musume wa gakusei desu.",
+      "side4": "Minha filha é estudante."
+    },
+    {
+      "side1": "山羊を見ました。",
+      "side2": "やぎをみました。",
+      "side3": "Yagi o mimashita.",
+      "side4": "Eu vi um bode."
+    },
+    {
+      "side1": "三菱の車を持っています。",
+      "side2": "みつびしのくるまをもっています",
+      "side3": "Mitsubishi no kuruma o motteimasu.",
+      "side4": "Eu tenho um carro da Mitsubishi."
+    },
+    {
+      "side1": "リンクをクリックします。",
+      "side2": "リンクをクリックします",
+      "side3": "Rinku o kurikku shimasu.",
+      "side4": "Eu clico no link."
+    },
+    {
+      "side1": "りんごを食べます。",
+      "side2": "りんごをたべます。",
+      "side3": "Ringo o tabemasu.",
+      "side4": "Eu como maçã."
+    },
+    {
+      "side1": "レースの服を買いました。",
+      "side2": "レースのふくをかいました。",
+      "side3": "Rēsu no fuku o kaimashita.",
+      "side4": "Eu comprei uma roupa de renda."
+    },
+    {
+      "side1": "レストランで食事します。",
+      "side2": "レストランでしょくじします。",
+      "side3": "Resutoran de shokuji shimasu.",
+      "side4": "Eu janto no restaurante."
+    },
+    {
+      "side1": "ローマ字で書きます。",
+      "side2": "ローマじでかきます。",
+      "side3": "Rōmaji de kakimasu.",
+      "side4": "Eu escrevo em romaji."
+    },
+    {
+      "side1": "路地に入ります。",
+      "side2": "ろじにはいります。",
+      "side3": "Roji ni hairimasu.",
+      "side4": "Eu entro na ruela."
+    },
+    {
+      "side1": "学校に行かない。",
+      "side2": "がっこうにいかない",
+      "side3": "Gakkou ni ikanai.",
+      "side4": "Eu não vou para a escola."
+    },
+    {
+      "side1": "日本に行きたいです。",
+      "side2": "にほんにいきたいです。",
+      "side3": "Nihon ni ikitai desu.",
+      "side4": "Eu quero ir ao Japão."
+    },
+    {
+      "side1": "明日、公園に行く。",
+      "side2": "あした、こうえんにいく。",
+      "side3": "Ashita, kouen ni iku.",
+      "side4": "Amanhã, eu vou ao parque."
+    },
+    {
+      "side1": "彼がここに来ます。",
+      "side2": "かれがここにくる。",
+      "side3": "Kare ga koko ni kimasu.",
+      "side4": "Ele vem para cá."
+    },
+    {
+      "side1": "宿題をする。",
+      "side2": "しゅくだいをする。",
+      "side3": "Shukudai o suru.",
+      "side4": "Eu faço o dever de casa."
+    },
+    {
+      "side1": "昨日、食べました。",
+      "side2": "きのう、たべました。",
+      "side3": "Kinou, tabemashita.",
+      "side4": "Eu comi ontem."
+    },
+    {
+      "side1": "おにぎりを食べる。",
+      "side2": "おにぎりをたべる。",
+      "side3": "Onigiri o taberu.",
+      "side4": "Eu como onigiri."
+    }
+  ]
+}

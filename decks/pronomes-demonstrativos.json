@@ -1,0 +1,59 @@
+{
+    "title": "Frases com Pronomes Demonstrativos",
+    "cards": [
+        {
+            "side1": "これは本です。",
+            "side2": "これは ほん です。",
+            "side3": "kore wa hon desu.",
+            "side4": "Isto é um livro."
+        },
+        {
+            "side1": "それは私のかさです。",
+            "side2": "それは わたし の かさ です。",
+            "side3": "sore wa watashi no kasa desu.",
+            "side4": "Esse é meu guarda‑chuva."
+        },
+        {
+            "side1": "あれは山です。",
+            "side2": "あれは やま です。",
+            "side3": "are wa yama desu.",
+            "side4": "Aquilo é uma montanha."
+        },
+        {
+            "side1": "この車は高いです。",
+            "side2": "この くるま は たかい です。",
+            "side3": "kono kuruma wa takai desu.",
+            "side4": "Este carro é caro."
+        },
+        {
+            "side1": "そのペンは青いです。",
+            "side2": "その ぺん は あおい です。",
+            "side3": "sono pen wa aoi desu.",
+            "side4": "Essa caneta é azul."
+        },
+        {
+            "side1": "あの家は古いです。",
+            "side2": "あの いえ は ふるい です。",
+            "side3": "ano ie wa furui desu.",
+            "side4": "Aquela casa é antiga."
+        },
+        {
+            "side1": "ここは駅です。",
+            "side2": "ここ は えき です。",
+            "side3": "koko wa eki desu.",
+            "side4": "Aqui é a estação."
+        },
+        {
+            "side1": "そこは図書館です。",
+            "side2": "そこ は としょかん です。",
+            "side3": "soko wa toshokan desu.",
+            "side4": "Aí é a biblioteca."
+        },
+        {
+            "side1": "あそこは学校です。",
+            "side2": "あそこ は がっこう です。",
+            "side3": "asoko wa gakkō desu.",
+            "side4": "Lá é a escola."
+        }
+    ]
+}

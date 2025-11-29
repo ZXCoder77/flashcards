@@ -1,0 +1,611 @@
+{
+    "title": "Contagem Numérica 0–100",
+    "cards": [
+        {
+            "side1": "零",
+            "side2": "れい",
+            "side3": "rei",
+            "side4": "0"
+        },
+        {
+            "side1": "一",
+            "side2": "いち",
+            "side3": "ichi",
+            "side4": "1"
+        },
+        {
+            "side1": "二",
+            "side2": "に",
+            "side3": "ni",
+            "side4": "2"
+        },
+        {
+            "side1": "三",
+            "side2": "さん",
+            "side3": "san",
+            "side4": "3"
+        },
+        {
+            "side1": "四",
+            "side2": "よん",
+            "side3": "yon",
+            "side4": "4"
+        },
+        {
+            "side1": "五",
+            "side2": "ご",
+            "side3": "go",
+            "side4": "5"
+        },
+        {
+            "side1": "六",
+            "side2": "ろく",
+            "side3": "roku",
+            "side4": "6"
+        },
+        {
+            "side1": "七",
+            "side2": "なな",
+            "side3": "nana",
+            "side4": "7"
+        },
+        {
+            "side1": "八",
+            "side2": "はち",
+            "side3": "hachi",
+            "side4": "8"
+        },
+        {
+            "side1": "九",
+            "side2": "きゅう",
+            "side3": "kyuu",
+            "side4": "9"
+        },
+        {
+            "side1": "十",
+            "side2": "じゅう",
+            "side3": "juu",
+            "side4": "10"
+        },
+        {
+            "side1": "十一",
+            "side2": "じゅういち",
+            "side3": "juuichi",
+            "side4": "11"
+        },
+        {
+            "side1": "十二",
+            "side2": "じゅうに",
+            "side3": "juuni",
+            "side4": "12"
+        },
+        {
+            "side1": "十三",
+            "side2": "じゅうさん",
+            "side3": "juusan",
+            "side4": "13"
+        },
+        {
+            "side1": "十四",
+            "side2": "じゅうよん",
+            "side3": "juuyon",
+            "side4": "14"
+        },
+        {
+            "side1": "十五",
+            "side2": "じゅうご",
+            "side3": "juugo",
+            "side4": "15"
+        },
+        {
+            "side1": "十六",
+            "side2": "じゅうろく",
+            "side3": "juuroku",
+            "side4": "16"
+        },
+        {
+            "side1": "十七",
+            "side2": "じゅうなな",
+            "side3": "juunana",
+            "side4": "17"
+        },
+        {
+            "side1": "十八",
+            "side2": "じゅうはち",
+            "side3": "juuhachi",
+            "side4": "18"
+        },
+        {
+            "side1": "十九",
+            "side2": "じゅうきゅう",
+            "side3": "juukyuu",
+            "side4": "19"
+        },
+        {
+            "side1": "二十",
+            "side2": "にじゅう",
+            "side3": "nijuu",
+            "side4": "20"
+        },
+        {
+            "side1": "二十一",
+            "side2": "にじゅういち",
+            "side3": "nijuuichi",
+            "side4": "21"
+        },
+        {
+            "side1": "二十二",
+            "side2": "にじゅうに",
+            "side3": "nijuuni",
+            "side4": "22"
+        },
+        {
+            "side1": "二十三",
+            "side2": "にじゅうさん",
+            "side3": "nijuusan",
+            "side4": "23"
+        },
+        {
+            "side1": "二十四",
+            "side2": "にじゅうよん",
+            "side3": "nijuuyon",
+            "side4": "24"
+        },
+        {
+            "side1": "二十五",
+            "side2": "にじゅうご",
+            "side3": "nijuugo",
+            "side4": "25"
+        },
+        {
+            "side1": "二十六",
+            "side2": "にじゅうろく",
+            "side3": "nijuuroku",
+            "side4": "26"
+        },
+        {
+            "side1": "二十七",
+            "side2": "にじゅうなな",
+            "side3": "nijuunana",
+            "side4": "27"
+        },
+        {
+            "side1": "二十八",
+            "side2": "にじゅうはち",
+            "side3": "nijuuhachi",
+            "side4": "28"
+        },
+        {
+            "side1": "二十九",
+            "side2": "にじゅうきゅう",
+            "side3": "nijuukyuu",
+            "side4": "29"
+        },
+        {
+            "side1": "三十",
+            "side2": "さんじゅう",
+            "side3": "sanjuu",
+            "side4": "30"
+        },
+        {
+            "side1": "三十一",
+            "side2": "さんじゅういち",
+            "side3": "sanjuuichi",
+            "side4": "31"
+        },
+        {
+            "side1": "三十二",
+            "side2": "さんじゅうに",
+            "side3": "sanjuuni",
+            "side4": "32"
+        },
+        {
+            "side1": "三十三",
+            "side2": "さんじゅうさん",
+            "side3": "sanjuusan",
+            "side4": "33"
+        },
+        {
+            "side1": "三十四",
+            "side2": "さんじゅうよん",
+            "side3": "sanjuuyon",
+            "side4": "34"
+        },
+        {
+            "side1": "三十五",
+            "side2": "さんじゅうご",
+            "side3": "sanjuugo",
+            "side4": "35"
+        },
+        {
+            "side1": "三十六",
+            "side2": "さんじゅうろく",
+            "side3": "sanjuuroku",
+            "side4": "36"
+        },
+        {
+            "side1": "三十七",
+            "side2": "さんじゅうなな",
+            "side3": "sanjuunana",
+            "side4": "37"
+        },
+        {
+            "side1": "三十八",
+            "side2": "さんじゅうはち",
+            "side3": "sanjuuhachi",
+            "side4": "38"
+        },
+        {
+            "side1": "三十九",
+            "side2": "さんじゅうきゅう",
+            "side3": "sanjuukyuu",
+            "side4": "39"
+        },
+        {
+            "side1": "四十",
+            "side2": "よんじゅう",
+            "side3": "yonjuu",
+            "side4": "40"
+        },
+        {
+            "side1": "四十一",
+            "side2": "よんじゅういち",
+            "side3": "yonjuuichi",
+            "side4": "41"
+        },
+        {
+            "side1": "四十二",
+            "side2": "よんじゅうに",
+            "side3": "yonjuuni",
+            "side4": "42"
+        },
+        {
+            "side1": "四十三",
+            "side2": "よんじゅうさん",
+            "side3": "yonjuusan",
+            "side4": "43"
+        },
+        {
+            "side1": "四十四",
+            "side2": "よんじゅうよん",
+            "side3": "yonjuuyon",
+            "side4": "44"
+        },
+        {
+            "side1": "四十五",
+            "side2": "よんじゅうご",
+            "side3": "yonjuugo",
+            "side4": "45"
+        },
+        {
+            "side1": "四十六",
+            "side2": "よんじゅうろく",
+            "side3": "yonjuuroku",
+            "side4": "46"
+        },
+        {
+            "side1": "四十七",
+            "side2": "よんじゅうなな",
+            "side3": "yonjuunana",
+            "side4": "47"
+        },
+        {
+            "side1": "四十八",
+            "side2": "よんじゅうはち",
+            "side3": "yonjuuhachi",
+            "side4": "48"
+        },
+        {
+            "side1": "四十九",
+            "side2": "よんじゅうきゅう",
+            "side3": "yonjuukyuu",
+            "side4": "49"
+        },
+        {
+            "side1": "五十",
+            "side2": "ごじゅう",
+            "side3": "gojuu",
+            "side4": "50"
+        },
+        {
+            "side1": "五十一",
+            "side2": "ごじゅういち",
+            "side3": "gojuuichi",
+            "side4": "51"
+        },
+        {
+            "side1": "五十二",
+            "side2": "ごじゅうに",
+            "side3": "gojuuni",
+            "side4": "52"
+        },
+        {
+            "side1": "五十三",
+            "side2": "ごじゅうさん",
+            "side3": "gojuusan",
+            "side4": "53"
+        },
+        {
+            "side1": "五十四",
+            "side2": "ごじゅうよん",
+            "side3": "gojuuyon",
+            "side4": "54"
+        },
+        {
+            "side1": "五十五",
+            "side2": "ごじゅうご",
+            "side3": "gojuugo",
+            "side4": "55"
+        },
+        {
+            "side1": "五十六",
+            "side2": "ごじゅうろく",
+            "side3": "gojuuroku",
+            "side4": "56"
+        },
+        {
+            "side1": "五十七",
+            "side2": "ごじゅうなな",
+            "side3": "gojuunana",
+            "side4": "57"
+        },
+        {
+            "side1": "五十八",
+            "side2": "ごじゅうはち",
+            "side3": "gojuuhachi",
+            "side4": "58"
+        },
+        {
+            "side1": "五十九",
+            "side2": "ごじゅうきゅう",
+            "side3": "gojuukyuu",
+            "side4": "59"
+        },
+        {
+            "side1": "六十",
+            "side2": "ろくじゅう",
+            "side3": "rokujuu",
+            "side4": "60"
+        },
+        {
+            "side1": "六十一",
+            "side2": "ろくじゅういち",
+            "side3": "rokujuuichi",
+            "side4": "61"
+        },
+        {
+            "side1": "六十二",
+            "side2": "ろくじゅうに",
+            "side3": "rokujuuni",
+            "side4": "62"
+        },
+        {
+            "side1": "六十三",
+            "side2": "ろくじゅうさん",
+            "side3": "rokujuusan",
+            "side4": "63"
+        },
+        {
+            "side1": "六十四",
+            "side2": "ろくじゅうよん",
+            "side3": "rokujuuyon",
+            "side4": "64"
+        },
+        {
+            "side1": "六十五",
+            "side2": "ろくじゅうご",
+            "side3": "rokujuugo",
+            "side4": "65"
+        },
+        {
+            "side1": "六十六",
+            "side2": "ろくじゅうろく",
+            "side3": "rokujuuroku",
+            "side4": "66"
+        },
+        {
+            "side1": "六十七",
+            "side2": "ろくじゅうなな",
+            "side3": "rokujuunana",
+            "side4": "67"
+        },
+        {
+            "side1": "六十八",
+            "side2": "ろくじゅうはち",
+            "side3": "rokujuuhachi",
+            "side4": "68"
+        },
+        {
+            "side1": "六十九",
+            "side2": "ろくじゅうきゅう",
+            "side3": "rokujuukyuu",
+            "side4": "69"
+        },
+        {
+            "side1": "七十",
+            "side2": "ななじゅう",
+            "side3": "nanajuu",
+            "side4": "70"
+        },
+        {
+            "side1": "七十一",
+            "side2": "ななじゅういち",
+            "side3": "nanajuuichi",
+            "side4": "71"
+        },
+        {
+            "side1": "七十二",
+            "side2": "ななじゅうに",
+            "side3": "nanajuuni",
+            "side4": "72"
+        },
+        {
+            "side1": "七十三",
+            "side2": "ななじゅうさん",
+            "side3": "nanajuusan",
+            "side4": "73"
+        },
+        {
+            "side1": "七十四",
+            "side2": "ななじゅうよん",
+            "side3": "nanajuuyon",
+            "side4": "74"
+        },
+        {
+            "side1": "七十五",
+            "side2": "ななじゅうご",
+            "side3": "nanajuugo",
+            "side4": "75"
+        },
+        {
+            "side1": "七十六",
+            "side2": "ななじゅうろく",
+            "side3": "nanajuuroku",
+            "side4": "76"
+        },
+        {
+            "side1": "七十七",
+            "side2": "ななじゅうなな",
+            "side3": "nanajuunana",
+            "side4": "77"
+        },
+        {
+            "side1": "七十八",
+            "side2": "ななじゅうはち",
+            "side3": "nanajuuhachi",
+            "side4": "78"
+        },
+        {
+            "side1": "七十九",
+            "side2": "ななじゅうきゅう",
+            "side3": "nanajuukyuu",
+            "side4": "79"
+        },
+        {
+            "side1": "八十",
+            "side2": "はちじゅう",
+            "side3": "hachijuu",
+            "side4": "80"
+        },
+        {
+            "side1": "八十一",
+            "side2": "はちじゅういち",
+            "side3": "hachijuuichi",
+            "side4": "81"
+        },
+        {
+            "side1": "八十二",
+            "side2": "はちじゅうに",
+            "side3": "hachijuuni",
+            "side4": "82"
+        },
+        {
+            "side1": "八十三",
+            "side2": "はちじゅうさん",
+            "side3": "hachijuusan",
+            "side4": "83"
+        },
+        {
+            "side1": "八十四",
+            "side2": "はちじゅうよん",
+            "side3": "hachijuuyon",
+            "side4": "84"
+        },
+        {
+            "side1": "八十五",
+            "side2": "はちじゅうご",
+            "side3": "hachijuugo",
+            "side4": "85"
+        },
+        {
+            "side1": "八十六",
+            "side2": "はちじゅうろく",
+            "side3": "hachijuuroku",
+            "side4": "86"
+        },
+        {
+            "side1": "八十七",
+            "side2": "はちじゅうなな",
+            "side3": "hachijuunana",
+            "side4": "87"
+        },
+        {
+            "side1": "八十八",
+            "side2": "はちじゅうはち",
+            "side3": "hachijuuhachi",
+            "side4": "88"
+        },
+        {
+            "side1": "八十九",
+            "side2": "はちじゅうきゅう",
+            "side3": "hachijuukyuu",
+            "side4": "89"
+        },
+        {
+            "side1": "九十",
+            "side2": "きゅうじゅう",
+            "side3": "kyuujuu",
+            "side4": "90"
+        },
+        {
+            "side1": "九十一",
+            "side2": "きゅうじゅういち",
+            "side3": "kyuujuuichi",
+            "side4": "91"
+        },
+        {
+            "side1": "九十二",
+            "side2": "きゅうじゅうに",
+            "side3": "kyuujuuni",
+            "side4": "92"
+        },
+        {
+            "side1": "九十三",
+            "side2": "きゅうじゅうさん",
+            "side3": "kyuujuusan",
+            "side4": "93"
+        },
+        {
+            "side1": "九十四",
+            "side2": "きゅうじゅうよん",
+            "side3": "kyuujuuyon",
+            "side4": "94"
+        },
+        {
+            "side1": "九十五",
+            "side2": "きゅうじゅうご",
+            "side3": "kyuujuugo",
+            "side4": "95"
+        },
+        {
+            "side1": "九十六",
+            "side2": "きゅうじゅうろく",
+            "side3": "kyuujuuroku",
+            "side4": "96"
+        },
+        {
+            "side1": "九十七",
+            "side2": "きゅうじゅうなな",
+            "side3": "kyuujuunana",
+            "side4": "97"
+        },
+        {
+            "side1": "九十八",
+            "side2": "きゅうじゅうはち",
+            "side3": "kyuujuuhachi",
+            "side4": "98"
+        },
+        {
+            "side1": "九十九",
+            "side2": "きゅうじゅうきゅう",
+            "side3": "kyuujuukyuu",
+            "side4": "99"
+        },
+        {
+            "side1": "百",
+            "side2": "ひゃく",
+            "side3": "hyaku",
+            "side4": "100"
+        }
+    ]
+}
