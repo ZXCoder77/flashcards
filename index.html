@@ -956,36 +956,51 @@
             showEditor();
         });
 
-        async function listDecks() {
-            deckList.innerHTML = '<p>Carregando decks...</p>';
-            const decks = [];
-
+        // Recursively collect .json files from a directory handle
+        async function collectJsonFiles(dirHandle, prefix = '') {
+            const files = [];
             try {
                 for await (const entry of dirHandle.values()) {
                     if (entry.kind === 'file' && entry.name.endsWith('.json')) {
-                        decks.push(entry);
+                        files.push({ handle: entry, path: prefix + entry.name });
+                    } else if (entry.kind === 'directory') {
+                        // Recurse into subdirectory
+                        const subFiles = await collectJsonFiles(entry, prefix + entry.name + '/');
+                        files.push(...subFiles);
                     }
                 }
+            } catch (err) {
+                console.error('Error collecting files from', prefix, err);
+            }
+            return files;
+        }
 
-                // Sort decks alphabetically
-                decks.sort((a, b) => a.name.localeCompare(b.name));
+        // List decks including those inside subfolders
+        async function listDecks() {
+            deckList.innerHTML = '<p>Carregando decks...</p>';
+
+            try {
+                const files = await collectJsonFiles(dirHandle);
+
+                // Sort by path
+                files.sort((a, b) => a.path.localeCompare(b.path));
 
                 deckList.innerHTML = '';
-                if (decks.length === 0) {
-                    deckList.innerHTML = '<p>Nenhum arquivo .json encontrado nesta pasta.</p>';
+                if (files.length === 0) {
+                    deckList.innerHTML = '<p>Nenhum arquivo .json encontrado nesta pasta ou subpastas.</p>';
                     return;
                 }
 
-                for (const entry of decks) {
+                for (const fileEntry of files) {
                     const card = document.createElement('div');
                     card.className = 'deck-item';
                     card.innerHTML = `
                         <div>
-                            <div class="deck-item-title">${entry.name}</div>
+                            <div class="deck-item-title">${fileEntry.path}</div>
                             <div class="deck-item-info">Clique para abrir</div>
                         </div>
                     `;
-                    card.onclick = () => loadDeckFromFile(entry);
+                    card.onclick = () => loadDeckFromFile(fileEntry.handle);
                     deckList.appendChild(card);
                 }
             } catch (err) {
