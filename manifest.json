@@ -1,7 +1,7 @@
 {
   "name": "日本語 Flashcards",
   "short_name": "Flashcards",
-  "start_url": "./flashcards.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f5e6d3",
   "theme_color": "#3498db",

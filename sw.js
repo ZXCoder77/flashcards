@@ -1,7 +1,7 @@
 const CACHE_NAME = 'flashcards-v1.251127';
 const ASSETS = [
   './',
-  './flashcards.html',
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
