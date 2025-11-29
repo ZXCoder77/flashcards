@@ -22,12 +22,12 @@
     {
       "side1": "こんにちは、アランです。初めまして。",
       "side2": "こんにちは、アラン です。はじめまして。",
-      "side3": "Kon'nichiwa, Arandesu. Hajimemashite.",
+      "side3": "Kon'nichiwa, Aran desu. Hajimemashite.",
       "side4": "Olá, eu sou alan. Prazer em conhecê-lo."
     },
     {
       "side1": "土曜日はショッピングモールに寿司を食べに行きます。",
-      "side2": "どようび は ショッピングモール に 寿司 を 食べに行きます。",
+      "side2": "どようび は ショッピングモール に すし を たべ に 行きます。",
       "side3": "Doyōbi wa shoppingumōru ni sushi o tabe ni ikimasu",
       "side4": "No sábado vou no shopping comer sushi."
     },
@@ -88,8 +88,14 @@
     {
       "side1": "これは何ですか",
       "side2": "これ は なん です か",
-      "side3": "Kore wa nan desu ka",
+      "side3": "Kore wa nan desu ka?",
       "side4": "O que é isso?"
+    },
+    {
+      "side1": "六人家族です。父と母と妹二人と弟と私です。",
+      "side2": "ろくにんかぞくです。ちちとははといもうとふたりとおとうととわたしです。",
+      "side3": "Rokunin kazoku desu. Chichi to haha to imōto futari to otōto to watashi desu.",
+      "side4": "Somos uma família de seis pessoas. São meu pai, minha mãe, duas irmãs mais novas, meu irmão mais novo e eu."
     }
   ]
 }
