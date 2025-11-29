@@ -699,7 +699,7 @@
             <div class="header">
                 <h1>日本語 Flashcards</h1>
                 <p>Estude japonês com flashcards interativos</p>
-                <small>versão 1.251129.1802</small>
+                <small>versão 1.251129.1821</small>
             </div>
 
             <!-- Initial State: Select Folder -->
@@ -970,7 +970,7 @@
             showEditor();
         });
 
-        // Create a new subfolder inside the selected directory
+        // Create a new subfolder inside the selected directory (ensure permission first)
         createFolderBtn.addEventListener('click', async () => {
             if (!dirHandle) {
                 alert('Por favor, selecione a pasta principal antes de criar subpastas.');
@@ -981,6 +981,12 @@
             if (!folderName) return;
 
             try {
+                const ok = await ensureWritePermission(dirHandle);
+                if (!ok) {
+                    alert('Permissão de escrita não concedida. Por favor, permita gravação na pasta selecionada.');
+                    return;
+                }
+
                 await dirHandle.getDirectoryHandle(folderName, { create: true });
                 await listDecks();
                 alert('Pasta criada: ' + folderName);
@@ -1088,6 +1094,20 @@
                 }
             } else {
                 throw new Error('removeEntry not supported by this browser');
+            }
+        }
+
+        // Ensure we have write permission on a handle (request if needed)
+        async function ensureWritePermission(handle) {
+            if (!handle || !handle.queryPermission) return false;
+            try {
+                const q = await handle.queryPermission({ mode: 'readwrite' });
+                if (q === 'granted') return true;
+                const r = await handle.requestPermission({ mode: 'readwrite' });
+                return r === 'granted';
+            } catch (err) {
+                console.error('Permission check/request failed', err);
+                return false;
             }
         }
 
@@ -1554,6 +1574,11 @@
 
             try {
                 const { parentHandle, name } = await getParentHandleAndName(dirHandle, sel);
+                const ok = await ensureWritePermission(parentHandle);
+                if (!ok) {
+                    alert('Permissão de escrita não concedida. Por favor, permita gravação na pasta selecionada.');
+                    return;
+                }
                 // Check if newName already exists in parent
                 try {
                     await parentHandle.getDirectoryHandle(newName);
@@ -1593,6 +1618,11 @@
 
             try {
                 const { parentHandle, name } = await getParentHandleAndName(dirHandle, sel);
+                const ok = await ensureWritePermission(parentHandle);
+                if (!ok) {
+                    alert('Permissão de escrita não concedida. Por favor, permita gravação na pasta selecionada.');
+                    return;
+                }
                 await removeDirectory(parentHandle, name);
                 await listDecks();
                 alert('Pasta excluída: ' + sel);
