@@ -28,15 +28,18 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      )
-    )
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter(key => key !== CACHE_NAME)
+        .map(key => caches.delete(key))
+    );
+    // Take control of uncontrolled clients as soon as the worker activates
+    if (self.clients && self.clients.claim) {
+      await self.clients.claim();
+    }
+  })());
 });
 
 /*

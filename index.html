@@ -46,9 +46,11 @@
 
             toast.classList.add('show');
 
-            updateBtn.addEventListener('click', () => {
+            // Use onclick to avoid adding multiple listeners if showUpdateToast is called repeatedly
+            updateBtn.onclick = () => {
+                updateBtn.disabled = true;
                 worker.postMessage({ type: 'SKIP_WAITING' });
-            });
+            };
         }
     </script>
     <style>
