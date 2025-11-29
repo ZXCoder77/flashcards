@@ -699,7 +699,7 @@
             <div class="header">
                 <h1>日本語 Flashcards</h1>
                 <p>Estude japonês com flashcards interativos</p>
-                <small>versão 1.251129.1821</small>
+                <small>versão 1.251129.1906</small>
             </div>
 
             <!-- Initial State: Select Folder -->
@@ -948,6 +948,18 @@
                 dirHandle = await window.showDirectoryPicker();
                 folderSelectArea.classList.add('hidden');
                 deckListArea.classList.remove('hidden');
+
+                // Request write permission right after folder selection to ensure browser prompts early.
+                try {
+                    const perm = await ensureWritePermission(dirHandle);
+                    if (!perm) {
+                        // Inform user permission wasn't granted but still continue to list decks.
+                        alert('Permissão de escrita não concedida. Algumas ações (criar/renomear/excluir) exigem permissão de gravação. Para conceder, permita gravação quando o navegador solicitar.');
+                    }
+                } catch (permErr) {
+                    console.warn('Permission request failed after selecting folder', permErr);
+                }
+
                 await listDecks();
             } catch (err) {
                 console.error('Error selecting folder:', err);
@@ -1082,11 +1094,12 @@
             }
         }
 
-        // Attempt to remove a directory entry from its parent (uses removeEntry if available)
-        async function removeDirectory(parentHandle, name) {
+        // Generic remove entry (file or directory) from its parent. Supports recursive for directories.
+        async function removeEntry(parentHandle, name, opts = { recursive: false }) {
             if (parentHandle.removeEntry) {
                 try {
-                    await parentHandle.removeEntry(name, { recursive: true });
+                    // Some implementations expect second arg as options object
+                    await parentHandle.removeEntry(name, opts);
                     return true;
                 } catch (err) {
                     console.error('removeEntry failed', err);
@@ -1097,14 +1110,58 @@
             }
         }
 
+        // Convenience wrapper to remove a directory recursively
+        async function removeDirectory(parentHandle, name) {
+            return removeEntry(parentHandle, name, { recursive: true });
+        }
+
         // Ensure we have write permission on a handle (request if needed)
         async function ensureWritePermission(handle) {
-            if (!handle || !handle.queryPermission) return false;
+            if (!handle) return false;
             try {
-                const q = await handle.queryPermission({ mode: 'readwrite' });
-                if (q === 'granted') return true;
-                const r = await handle.requestPermission({ mode: 'readwrite' });
-                return r === 'granted';
+                // Prefer requestPermission if available (some implementations expose only this)
+                if (typeof handle.requestPermission === 'function') {
+                    try {
+                        const r = await handle.requestPermission({ mode: 'readwrite' });
+                        if (r === 'granted') return true;
+                    } catch (err) {
+                        // fallthrough to other checks
+                        console.warn('requestPermission failed', err);
+                    }
+                }
+
+                if (typeof handle.queryPermission === 'function') {
+                    try {
+                        const q = await handle.queryPermission({ mode: 'readwrite' });
+                        if (q === 'granted') return true;
+                        const r = await handle.requestPermission({ mode: 'readwrite' });
+                        return r === 'granted';
+                    } catch (err) {
+                        console.warn('query/requestPermission failed', err);
+                    }
+                }
+
+                // Fallback: attempt a harmless write to force browser permission prompt.
+                // Create a temporary file and remove it if possible.
+                try {
+                    const testName = '__flashcards_perm_test__';
+                    const fh = await handle.getFileHandle(testName, { create: true });
+                    const w = await fh.createWritable();
+                    await w.write('');
+                    await w.close();
+                    // Try to remove the test file if removeEntry is available
+                    if (handle.removeEntry) {
+                        try {
+                            await handle.removeEntry(testName);
+                        } catch (rmErr) {
+                            console.warn('Could not remove test file', rmErr);
+                        }
+                    }
+                    return true;
+                } catch (err) {
+                    console.warn('Fallback write test failed', err);
+                    return false;
+                }
             } catch (err) {
                 console.error('Permission check/request failed', err);
                 return false;
@@ -1122,8 +1179,93 @@
                         <div class="deck-item-title">${fileEntry.path}</div>
                         <div class="deck-item-info">Clique para abrir</div>
                     </div>
+                    <div class="deck-item-actions">
+                        <button class="deck-item-btn open-deck-btn">Abrir</button>
+                        <button class="deck-item-btn rename-deck-btn">Renomear</button>
+                        <button class="deck-item-btn delete-deck-btn">Excluir</button>
+                    </div>
                 `;
-                card.onclick = () => loadDeckFromFile(fileEntry.handle);
+
+                // Open handler
+                card.querySelector('.open-deck-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    loadDeckFromFile(fileEntry.handle);
+                });
+
+                // Rename handler
+                card.querySelector('.rename-deck-btn').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const currentName = fileEntry.path.split('/').pop();
+                    let newName = prompt('Novo nome do arquivo (inclua .json):', currentName);
+                    if (!newName) return;
+                    if (!newName.toLowerCase().endsWith('.json')) newName += '.json';
+
+                    try {
+                        const { parentHandle, name } = await getParentHandleAndName(dirHandle, fileEntry.path);
+                        // Request write permission on the original directory handle (dirHandle)
+                        // This is more reliable across browsers than requesting on a derived handle.
+                        const ok = await ensureWritePermission(dirHandle);
+                        if (!ok) {
+                            alert('Permissão de escrita não concedida. Por favor, permita gravação na pasta selecionada.');
+                            return;
+                        }
+
+                        // Check if target exists
+                        try {
+                            await parentHandle.getFileHandle(newName);
+                            alert('Já existe um arquivo com esse nome. Escolha outro nome.');
+                            return;
+                        } catch (err) {
+                            // doesn't exist, proceed
+                        }
+
+                        // Read source file
+                        const srcFile = await fileEntry.handle.getFile();
+                        const data = await srcFile.arrayBuffer();
+
+                        // Create destination and write
+                        const destFH = await parentHandle.getFileHandle(newName, { create: true });
+                        const w = await destFH.createWritable();
+                        await w.write(data);
+                        await w.close();
+
+                        // Remove original
+                        try {
+                            await removeEntry(parentHandle, name);
+                        } catch (err) {
+                            console.warn('Could not remove original file after renaming:', err);
+                            alert('Arquivo copiado, mas não foi possível remover o arquivo antigo automaticamente. Remova manualmente se desejar.');
+                        }
+
+                        await listDecks();
+                        alert('Arquivo renomeado para ' + newName);
+                    } catch (err) {
+                        console.error('Error renaming file:', err);
+                        alert('Erro ao renomear arquivo. Verifique permissões no navegador.');
+                    }
+                });
+
+                // Delete handler
+                card.querySelector('.delete-deck-btn').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (!confirm('Tem certeza que deseja excluir o arquivo "' + fileEntry.path + '"?')) return;
+                    try {
+                        const { parentHandle, name } = await getParentHandleAndName(dirHandle, fileEntry.path);
+                        // Request write permission on the original directory handle (dirHandle)
+                        const ok = await ensureWritePermission(dirHandle);
+                        if (!ok) {
+                            alert('Permissão de escrita não concedida. Por favor, permita gravação na pasta selecionada.');
+                            return;
+                        }
+                        await removeEntry(parentHandle, name);
+                        await listDecks();
+                        alert('Arquivo excluído: ' + fileEntry.path);
+                    } catch (err) {
+                        console.error('Error deleting file:', err);
+                        alert('Erro ao excluir arquivo. Talvez o navegador não suporte remoção programática.');
+                    }
+                });
+
                 deckList.appendChild(card);
             }
         }
@@ -1574,7 +1716,7 @@
 
             try {
                 const { parentHandle, name } = await getParentHandleAndName(dirHandle, sel);
-                const ok = await ensureWritePermission(parentHandle);
+                const ok = await ensureWritePermission(dirHandle);
                 if (!ok) {
                     alert('Permissão de escrita não concedida. Por favor, permita gravação na pasta selecionada.');
                     return;
@@ -1618,7 +1760,7 @@
 
             try {
                 const { parentHandle, name } = await getParentHandleAndName(dirHandle, sel);
-                const ok = await ensureWritePermission(parentHandle);
+                const ok = await ensureWritePermission(dirHandle);
                 if (!ok) {
                     alert('Permissão de escrita não concedida. Por favor, permita gravação na pasta selecionada.');
                     return;
