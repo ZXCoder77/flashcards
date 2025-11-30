@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost/sites/github/flashcards/api'; // Adjust if needed
+// const API_URL = 'http://192.168.0.134/sites/github/flashcards/api'; // Adjust if needed
+const API_URL = 'https://floralwhite-mallard-529640.hostingersite.com/api';
 
 const state = {
     user: JSON.parse(localStorage.getItem('user')) || null,
@@ -291,34 +292,68 @@ const pitchInput = document.getElementById('pitch');
 const rateValue = document.getElementById('rateValue');
 const pitchValue = document.getElementById('pitchValue');
 
+function isJapaneseVoice(voice) {
+    return voice && voice.lang && voice.lang.toLowerCase().startsWith('ja');
+}
+
 function loadVoices() {
-    voices = speechSynthesis.getVoices();
+    voices = speechSynthesis.getVoices() || [];
     if (!voiceSelect) return;
     voiceSelect.innerHTML = '';
-    voices.forEach((voice, index) => {
-        if (voice.lang === 'ja-JP') {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = `${voice.name} (${voice.lang})`;
-            option.selected = true;
-            voiceSelect.appendChild(option);
-        }
+
+    // Prioritize Japanese voices; if none, list all voices as fallback
+    const jap = voices.filter(isJapaneseVoice);
+    const list = jap.length ? jap : voices;
+
+    list.forEach((voice) => {
+        const option = document.createElement('option');
+        // store the index from the global voices array so selection maps correctly
+        option.value = voices.indexOf(voice);
+        option.textContent = `${voice.name} (${voice.lang})`;
+        voiceSelect.appendChild(option);
     });
+
+    if (voiceSelect.options.length) voiceSelect.selectedIndex = 0;
 }
 
 speechSynthesis.onvoiceschanged = loadVoices;
-loadVoices();
+// attempt initial load; on many Android devices this will populate only after user interaction
+setTimeout(loadVoices, 0);
 
 if (ttsBtn) {
-    ttsBtn.addEventListener('click', () => {
-        const text = document.getElementById('cardText').textContent;
-        const utterance = new SpeechSynthesisUtterance(text);
-        const selectedVoice = voices[voiceSelect.value];
-        if (selectedVoice) {
-            utterance.voice = selectedVoice;
+    ttsBtn.addEventListener('click', async () => {
+        const text = document.getElementById('cardText').textContent || '';
+        if (!text) return;
+
+        // ensure voices are loaded after this user gesture
+        if (!voices.length) {
+            loadVoices();
+            // small delay to allow the browser to populate voices list
+            await new Promise(r => setTimeout(r, 200));
         }
-        utterance.rate = parseFloat(rateInput.value);
-        utterance.pitch = parseFloat(pitchInput.value);
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+
+        utterance.rate = parseFloat(rateInput?.value || 1);
+        utterance.pitch = parseFloat(pitchInput?.value || 1);
+
+        // Determine selected voice from select element (value is global index)
+        let selectedVoice = null;
+        if (voiceSelect && voiceSelect.value) {
+            const idx = parseInt(voiceSelect.value, 10);
+            if (!Number.isNaN(idx) && voices[idx]) selectedVoice = voices[idx];
+        }
+
+        // Fallback: pick first Japanese voice, otherwise first available
+        if (!selectedVoice) selectedVoice = voices.find(isJapaneseVoice) || voices[0] || null;
+        if (selectedVoice) utterance.voice = selectedVoice;
+
+        utterance.onstart = () => console.log('TTS started', utterance.voice && utterance.voice.name);
+        utterance.onerror = (e) => console.error('TTS error', e);
+        utterance.onend = () => console.log('TTS ended');
+
+        try { speechSynthesis.cancel(); } catch (e) {}
         speechSynthesis.speak(utterance);
     });
 }

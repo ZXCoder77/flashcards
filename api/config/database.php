@@ -2,9 +2,9 @@
 class Database
 {
     private $host = "localhost";
-    private $db_name = "flashcards";
-    private $username = "root";
-    private $password = "";
+    private $db_name = "u956761219_flashcards";
+    private $username = "u956761219_root";
+    private $password = "u956761219U";
     public $conn;
 
     public function getConnection()
