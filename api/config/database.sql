@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS flashcards_db;
-USE flashcards_db;
+CREATE DATABASE IF NOT EXISTS flashcards;
+USE flashcards;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,

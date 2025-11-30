@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost/flashcards/api'; // Adjust if needed
+const API_URL = 'http://localhost/sites/github/flashcards/api'; // Adjust if needed
 
 const state = {
     user: JSON.parse(localStorage.getItem('user')) || null,

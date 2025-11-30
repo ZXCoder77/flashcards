@@ -44,7 +44,7 @@ switch ($method) {
             }
         } else {
             // Get all decks for user
-            $query = "SELECT * FROM decks WHERE user_id = ? ORDER BY created_at DESC";
+            $query = "SELECT * FROM decks WHERE user_id = ? ORDER BY title ASC";
             $stmt = $db->prepare($query);
             $stmt->execute([$user_id]);
             $decks = $stmt->fetchAll(PDO::FETCH_ASSOC);
