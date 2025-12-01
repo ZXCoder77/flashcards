@@ -719,7 +719,7 @@
         <div class="header">
             <h1>日本語 Flashcards</h1>
             <p>Estude japonês com flashcards interativos</p>
-            <small>versão 1.251201.1600</small>
+            <small>versão 1.251201.1638</small>
         </div>
 
         <!-- Auth Section -->
@@ -738,9 +738,11 @@
                             style="width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px;">
                     </div>
                     <button class="btn btn-primary" id="loginBtn" style="width: 100%;">Entrar</button>
+                    <!--
                     <p style="margin-top: 15px; text-align: center;">
                         Não tem conta? <a href="#" id="toggleAuth">Registre-se</a>
                     </p>
+                    -->
                 </div>
 
                 <div id="registerForm" class="hidden">
@@ -1201,12 +1203,14 @@
             if (title) createDeck(title);
         });
 
+        /*
         document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
 
         function toggleAuthMode() {
             loginForm.classList.toggle('hidden');
             registerForm.classList.toggle('hidden');
         }
+        */
 
         // Navigation
         document.getElementById('nextBtn').addEventListener('click', () => {

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - 日本語 Flashcards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5e6d3 0%, #d4e4e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+        }
+
+        .settings-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .text-center {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .text-center a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .text-center a:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.show {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>日本語 Flashcards</h1>
+            <p>Crie sua conta para começar</p>
+        </div>
+
+        <div class="settings-panel">
+            <div class="settings-header">Registro</div>
+
+            <div id="messageBox" class="message"></div>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regUser">Usuário</label>
+                    <input type="text" id="regUser" class="form-control" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="regPass">Senha</label>
+                    <input type="password" id="regPass" class="form-control" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary" id="registerBtn">Registrar</button>
+            </form>
+
+            <p class="text-center">
+                Já tem conta? <a href="index.html">Faça Login</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // const API_URL = 'http://localhost/sites/github/flashcards/api';
+        const API_URL = 'https://floralwhite-mallard-529640.hostingersite.com/api';
+
+        const messageBox = document.getElementById('messageBox');
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const regUser = document.getElementById('regUser');
+        const regPass = document.getElementById('regPass');
+
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = `message ${type} show`;
+            setTimeout(() => {
+                messageBox.className = 'message';
+            }, 5000);
+        }
+
+        async function register(username, password) {
+            if (!username || !password) {
+                showMessage('Por favor, preencha todos os campos.', 'error');
+                return;
+            }
+
+            if (username.length < 3) {
+                showMessage('O usuário deve ter pelo menos 3 caracteres.', 'error');
+                return;
+            }
+
+            if (password.length < 4) {
+                showMessage('A senha deve ter pelo menos 4 caracteres.', 'error');
+                return;
+            }
+
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Registrando...';
+
+            try {
+                const response = await fetch(`${API_URL}/auth.php`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'register', username, password })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('Registro realizado com sucesso! Redirecionando para login...', 'success');
+                    regUser.value = '';
+                    regPass.value = '';
+
+                    // Redirect to login page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } else {
+                    showMessage(data.message || 'Erro ao registrar usuário.', 'error');
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'Registrar';
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                showMessage('Erro ao conectar com o servidor.', 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Registrar';
+            }
+        }
+
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            register(regUser.value.trim(), regPass.value);
+        });
+
+        // Auto-focus on username field
+        regUser.focus();
+    </script>
+</body>
+
+</html>
