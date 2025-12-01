@@ -53,39 +53,65 @@ switch ($method) {
         break;
 
     case 'POST':
+        $action = isset($_GET['action']) ? $_GET['action'] : '';
+
         if (!empty($data->title)) {
-            $query = "INSERT INTO decks SET title = :title, user_id = :user_id";
-            $stmt = $db->prepare($query);
+            $deck_id = null;
+            $is_update = false;
 
-            $data->title = htmlspecialchars(strip_tags($data->title));
+            if ($action === 'import') {
+                // Check if deck exists
+                $checkQuery = "SELECT id FROM decks WHERE title = ? AND user_id = ?";
+                $checkStmt = $db->prepare($checkQuery);
+                $checkStmt->execute([$data->title, $user_id]);
 
-            $stmt->bindParam(":title", $data->title);
-            $stmt->bindParam(":user_id", $user_id);
+                if ($checkStmt->rowCount() > 0) {
+                    $existingDeck = $checkStmt->fetch(PDO::FETCH_ASSOC);
+                    $deck_id = $existingDeck['id'];
+                    $is_update = true;
 
-            if ($stmt->execute()) {
-                $deck_id = $db->lastInsertId();
-
-                // If cards are provided, insert them
-                if (isset($data->cards) && is_array($data->cards)) {
-                    $cardQuery = "INSERT INTO cards (deck_id, side1, side2, side3, side4) VALUES (:deck_id, :side1, :side2, :side3, :side4)";
-                    $cardStmt = $db->prepare($cardQuery);
-
-                    foreach ($data->cards as $card) {
-                        $cardStmt->execute([
-                            ':deck_id' => $deck_id,
-                            ':side1' => $card->side1 ?? '',
-                            ':side2' => $card->side2 ?? '',
-                            ':side3' => $card->side3 ?? '',
-                            ':side4' => $card->side4 ?? ''
-                        ]);
-                    }
+                    // Delete existing cards
+                    $delStmt = $db->prepare("DELETE FROM cards WHERE deck_id = ?");
+                    $delStmt->execute([$deck_id]);
                 }
-
-                echo json_encode(["message" => "Deck created.", "id" => $deck_id]);
-            } else {
-                http_response_code(503);
-                echo json_encode(["message" => "Unable to create deck."]);
             }
+
+            if (!$is_update) {
+                $query = "INSERT INTO decks SET title = :title, user_id = :user_id";
+                $stmt = $db->prepare($query);
+
+                $data->title = htmlspecialchars(strip_tags($data->title));
+
+                $stmt->bindParam(":title", $data->title);
+                $stmt->bindParam(":user_id", $user_id);
+
+                if ($stmt->execute()) {
+                    $deck_id = $db->lastInsertId();
+                } else {
+                    http_response_code(503);
+                    echo json_encode(["message" => "Unable to create deck."]);
+                    break;
+                }
+            }
+
+            // If cards are provided, insert them
+            if (isset($data->cards) && is_array($data->cards)) {
+                $cardQuery = "INSERT INTO cards (deck_id, side1, side2, side3, side4) VALUES (:deck_id, :side1, :side2, :side3, :side4)";
+                $cardStmt = $db->prepare($cardQuery);
+
+                foreach ($data->cards as $card) {
+                    $cardStmt->execute([
+                        ':deck_id' => $deck_id,
+                        ':side1' => $card->side1 ?? '',
+                        ':side2' => $card->side2 ?? '',
+                        ':side3' => $card->side3 ?? '',
+                        ':side4' => $card->side4 ?? ''
+                    ]);
+                }
+            }
+
+            echo json_encode(["message" => $is_update ? "Deck imported (updated)." : "Deck created.", "id" => $deck_id]);
+
         } else {
             http_response_code(400);
             echo json_encode(["message" => "Incomplete data."]);

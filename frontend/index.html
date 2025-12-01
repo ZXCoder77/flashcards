@@ -719,7 +719,7 @@
         <div class="header">
             <h1>日本語 Flashcards</h1>
             <p>Estude japonês com flashcards interativos</p>
-            <small>versão 1.251201.1050</small>
+            <small>versão 1.251201.1536</small>
         </div>
 
         <!-- Auth Section -->
@@ -774,9 +774,11 @@
             <!-- Deck List State -->
             <div id="deckListArea">
                 <div class="deck-list-header"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px;">
                     <h2 style="font-size: 1.5rem; color: #34495e;">Meus Decks</h2>
-                    <button class="btn btn-primary" id="createNewDeckBtn">✨ Novo Deck</button>
+                    <button class="btn btn-primary" id="createNewDeckBtn" style="margin-left: 10px">✨ Novo Deck</button>
+                    <button class="btn btn-secondary" id="importDeckBtn" style="margin-left: 10px">📥 Importar</button>
+                    <input type="file" id="importFileInput" accept=".json" style="display: none;">
                 </div>
                 <div id="deckList" class="deck-grid">
                     <!-- Decks will be injected here -->
@@ -896,7 +898,7 @@
 
     <!--<script src="js/app.js"></script>-->
     <script>
-        // const API_URL = 'http://192.168.0.134/sites/github/flashcards/api'; // Adjust if needed
+        // const API_URL = 'http://localhost/sites/github/flashcards/api';
         const API_URL = 'https://floralwhite-mallard-529640.hostingersite.com/api';
 
         const state = {
@@ -1022,32 +1024,96 @@
             }
         }
 
+        // Import/Export Functions
+        document.getElementById('importDeckBtn').addEventListener('click', () => {
+            document.getElementById('importFileInput').click();
+        });
+
+        document.getElementById('importFileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const deckData = JSON.parse(event.target.result);
+                    if (!deckData.title || !Array.isArray(deckData.cards)) {
+                        alert('Formato de arquivo inválido.');
+                        return;
+                    }
+
+                    const response = await fetch(`${API_URL}/decks.php?action=import&user_id=${state.user.id}`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            title: deckData.title,
+                            cards: deckData.cards,
+                            user_id: state.user.id
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert(result.message);
+                        fetchDecks();
+                    } else {
+                        alert('Erro ao importar: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('Erro ao processar arquivo.');
+                }
+                e.target.value = '';
+            };
+            reader.readAsText(file);
+        });
+
+        async function exportDeck(id) {
+            try {
+                const response = await fetch(`${API_URL}/decks.php?id=${id}&user_id=${state.user.id}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    const exportData = {
+                        title: data.title,
+                        cards: data.cards.map(card => ({
+                            side1: card.side1,
+                            side2: card.side2,
+                            side3: card.side3,
+                            side4: card.side4
+                        }))
+                    };
+
+                    const blob = new Blob([JSON.stringify(exportData, null, 4)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${data.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Erro ao exportar deck.');
+            }
+        }
+
         // UI Functions
         function showAuth() {
             authSection.classList.remove('hidden');
             appSection.classList.add('hidden');
             deckListArea.classList.add('hidden');
             appContent.classList.remove('active');
-            // if (editorSection) editorSection.classList.remove('active');
-            // // Clear login/register forms to remove persisted input when showing auth
-            // try {
-            //     if (loginForm && typeof loginForm.reset === 'function') loginForm.reset();
-            //     if (registerForm && typeof registerForm.reset === 'function') registerForm.reset();
-            // } catch (e) {
-            // fallback: clear individual fields if reset is not available
+
             const lu = document.getElementById('loginUser');
             const lp = document.getElementById('loginPass');
-            // if (lu) lu.value = '';
-            // if (lp) lp.value = '';
-            lu.value = '';
-            lp.value = '';
+            if (lu) lu.value = '';
+            if (lp) lp.value = '';
             const ru = document.getElementById('regUser');
             const rp = document.getElementById('regPass');
-            // if (ru) ru.value = '';
-            // if (rp) rp.value = '';
-            ru.value = '';
-            rp.value = '';
-            // }
+            if (ru) ru.value = '';
+            if (rp) rp.value = '';
         }
 
         function showApp() {
@@ -1055,7 +1121,7 @@
             appSection.classList.remove('hidden');
             deckListArea.classList.remove('hidden');
             appContent.classList.remove('active');
-            if (editorSection) editorSection.classList.remove('active');
+            if (document.getElementById('editorSection')) document.getElementById('editorSection').classList.remove('active');
             fetchDecks();
             document.getElementById('welcomeUser').textContent = `Olá, ${state.user.username}`;
         }
@@ -1076,6 +1142,7 @@
                     <div class="deck-item-title">${deck.title}</div>
                     <div class="deck-item-actions">
                         <button class="deck-item-btn" onclick="openDeck(${deck.id})">Abrir</button>
+                        <button class="deck-item-btn" onclick="exportDeck(${deck.id})">Exportar</button>
                         <button class="deck-item-btn" onclick="deleteDeck(${deck.id})" style="color:red; border-color:red;">Excluir</button>
                     </div>
                 `;
@@ -1093,13 +1160,6 @@
             // Default
             document.getElementById('cardText').textContent = card.side1;
             document.getElementById('cardLabel').textContent = ""; // Side 1
-
-            // const sideLabels = [
-            //     { label: 'Kanji', description: 'Japonês com kanji' },
-            //     { label: 'Hiragana', description: 'Pronúncia em hiragana/katakana' },
-            //     { label: 'Rōmaji', description: 'Pronúncia romanizada' },
-            //     { label: 'Português', description: 'Tradução' }
-            // ];
 
             // Reset active side button
             document.querySelectorAll('.side-btn').forEach(btn => btn.classList.remove('active'));
@@ -1181,8 +1241,6 @@
                 e.target.classList.add('active');
             });
         });
-
-        // --- Missing Logic Appended ---
 
         // Deck Actions
         const shuffleBtn = document.getElementById('shuffleBtn');
@@ -1321,27 +1379,27 @@
                 const cardItem = document.createElement('div');
                 cardItem.className = 'editor-card-item';
                 cardItem.innerHTML = `
-                    <div class="editor-card-header">
-                        <span class="editor-card-title">Card ${index + 1}</span>
-                        <button class="delete-btn" onclick="deleteCard(${index})">🗑️</button>
-                    </div>
-                    <div class="input-group">
-                        <label>Lado 1 (Kanji/Principal)</label>
-                        <input type="text" value="${card.side1 || ''}" onchange="updateCardData(${index}, 'side1', this.value)">
-                    </div>
-                    <div class="input-group">
-                        <label>Lado 2 (Hiragana/Leitura)</label>
-                        <input type="text" value="${card.side2 || ''}" onchange="updateCardData(${index}, 'side2', this.value)">
-                    </div>
-                    <div class="input-group">
-                        <label>Lado 3 (Romaji)</label>
-                        <input type="text" value="${card.side3 || ''}" onchange="updateCardData(${index}, 'side3', this.value)">
-                    </div>
-                    <div class="input-group">
-                        <label>Lado 4 (Tradução)</label>
-                        <input type="text" value="${card.side4 || ''}" onchange="updateCardData(${index}, 'side4', this.value)">
-                    </div>
-                `;
+                <div class="editor-card-header">
+                    <span class="editor-card-title">Card ${index + 1}</span>
+                    <button class="delete-btn" onclick="deleteCard(${index})">🗑️</button>
+                </div>
+                <div class="input-group">
+                    <label>Lado 1 (Kanji/Principal)</label>
+                    <input type="text" value="${card.side1 || ''}" onchange="updateCardData(${index}, 'side1', this.value)">
+                </div>
+                <div class="input-group">
+                    <label>Lado 2 (Hiragana/Leitura)</label>
+                    <input type="text" value="${card.side2 || ''}" onchange="updateCardData(${index}, 'side2', this.value)">
+                </div>
+                <div class="input-group">
+                    <label>Lado 3 (Romaji)</label>
+                    <input type="text" value="${card.side3 || ''}" onchange="updateCardData(${index}, 'side3', this.value)">
+                </div>
+                <div class="input-group">
+                    <label>Lado 4 (Tradução)</label>
+                    <input type="text" value="${card.side4 || ''}" onchange="updateCardData(${index}, 'side4', this.value)">
+                </div>
+            `;
                 editorCardList.appendChild(cardItem);
             });
         }
