@@ -719,7 +719,7 @@
         <div class="header">
             <h1>日本語 Flashcards</h1>
             <p>Estude japonês com flashcards interativos</p>
-            <small>versão 1.251201.1536</small>
+            <small>versão 1.251201.1600</small>
         </div>
 
         <!-- Auth Section -->
@@ -1307,7 +1307,11 @@
 
         if (ttsBtn) {
             ttsBtn.addEventListener('click', async () => {
-                const text = document.getElementById('cardText').textContent || '';
+
+                // const text = document.getElementById('cardText').textContent || '';
+                const card = state.currentDeck.cards[state.currentCardIndex];
+                const text = card.side1;
+
                 if (!text) return;
 
                 // ensure voices are loaded after this user gesture
