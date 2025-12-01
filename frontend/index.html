@@ -9,24 +9,38 @@
     <meta name="theme-color" content="#3498db">
     <link rel="apple-touch-icon" href="icon-192.png">
     <script>
+        let newWorker;
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(registration => {
                     console.log('SW registered:', registration);
 
-                    // Check for updates
+                    // Check for updates periodically
+                    setInterval(() => {
+                        registration.update();
+                    }, 60 * 60 * 1000); // Check every hour
+
+                    // Check for updates when the page becomes visible
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.visibilityState === 'visible') {
+                            registration.update();
+                        }
+                    });
+
                     registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
+                        newWorker = registration.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                showUpdateToast(newWorker);
+                                showUpdateToast();
                             }
                         });
                     });
 
                     // If there's already a waiting worker, show toast
                     if (registration.waiting) {
-                        showUpdateToast(registration.waiting);
+                        newWorker = registration.waiting;
+                        showUpdateToast();
                     }
                 }).catch(error => console.log('SW registration failed:', error));
 
@@ -41,25 +55,25 @@
         }
 
         function showUpdateToast(worker) {
-                const toast = document.getElementById('updateToast');
-                const updateBtn = document.getElementById('updateAppBtn');
+            const toast = document.getElementById('updateToast');
+            const updateBtn = document.getElementById('updateAppBtn');
 
-                if (!toast) {
-                    console.warn('showUpdateToast: #updateToast not found in DOM');
-                    return;
-                }
+            if (!toast) {
+                console.warn('showUpdateToast: #updateToast not found in DOM');
+                return;
+            }
 
-                toast.classList.add('show');
+            toast.classList.add('show');
 
-                // Use onclick to avoid adding multiple listeners if showUpdateToast is called repeatedly
-                if (updateBtn) {
-                    updateBtn.onclick = () => {
-                        updateBtn.disabled = true;
-                        try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) { console.error(e); }
-                    };
-                } else {
-                    console.warn('showUpdateToast: #updateAppBtn not found in DOM');
-                }
+            // Use onclick to avoid adding multiple listeners if showUpdateToast is called repeatedly
+            if (updateBtn) {
+                updateBtn.onclick = () => {
+                    updateBtn.disabled = true;
+                    try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) { console.error(e); }
+                };
+            } else {
+                console.warn('showUpdateToast: #updateAppBtn not found in DOM');
+            }
         }
     </script>
     <style>
@@ -705,7 +719,7 @@
         <div class="header">
             <h1>日本語 Flashcards</h1>
             <p>Estude japonês com flashcards interativos</p>
-            <small>versão 1.251130.2029</small>
+            <small>versão 1.251201.1043</small>
         </div>
 
         <!-- Auth Section -->
@@ -800,10 +814,10 @@
                         </div>
 
                         <div class="side-buttons">
-                            <button class="side-btn active" data-side="1">Lado 1</button>
-                            <button class="side-btn" data-side="2">Lado 2</button>
-                            <button class="side-btn" data-side="3">Lado 3</button>
-                            <button class="side-btn" data-side="4">Lado 4</button>
+                            <button class="side-btn active" data-side="1">Kanji</button>
+                            <button class="side-btn" data-side="2">Hiragana</button>
+                            <button class="side-btn" data-side="3">Rōmaji</button>
+                            <button class="side-btn" data-side="4">Português</button>
                         </div>
 
                         <div class="controls">
@@ -880,7 +894,522 @@
         <button id="updateAppBtn" class="update-btn">Atualizar</button>
     </div>
 
-    <script src="js/app-0001.js"></script>
+    <!--<script src="js/app.js"></script>-->
+    <script>
+        // const API_URL = 'http://192.168.0.134/sites/github/flashcards/api'; // Adjust if needed
+        const API_URL = 'https://floralwhite-mallard-529640.hostingersite.com/api';
+
+        const state = {
+            user: JSON.parse(localStorage.getItem('user')) || null,
+            decks: [],
+            currentDeck: null,
+            currentCardIndex: 0,
+            isFlipped: false
+        };
+
+        // DOM Elements
+        const authSection = document.getElementById('authSection');
+        const appSection = document.getElementById('appSection');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const deckListArea = document.getElementById('deckListArea');
+        const appContent = document.getElementById('appContent');
+        const deckList = document.getElementById('deckList');
+
+        // Auth Functions
+        async function login(username, password) {
+            try {
+                const response = await fetch(`${API_URL}/auth.php`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'login', username, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    state.user = { id: data.user_id, username: data.username };
+                    localStorage.setItem('user', JSON.stringify(state.user));
+                    showApp();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Erro ao conectar com o servidor.');
+            }
+        }
+
+        async function register(username, password) {
+            try {
+                const response = await fetch(`${API_URL}/auth.php`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'register', username, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert('Registro realizado com sucesso! Faça login.');
+                    toggleAuthMode();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                alert('Erro ao conectar com o servidor.');
+            }
+        }
+
+        function logout() {
+            state.user = null;
+            localStorage.removeItem('user');
+            showAuth();
+        }
+
+        // Deck Functions
+        async function fetchDecks() {
+            if (!state.user) return;
+            try {
+                const response = await fetch(`${API_URL}/decks.php?user_id=${state.user.id}`);
+                const data = await response.json();
+                if (response.ok) {
+                    state.decks = data;
+                    renderDeckList();
+                }
+            } catch (error) {
+                console.error('Fetch decks error:', error);
+            }
+        }
+
+        async function createDeck(title) {
+            if (!state.user) return;
+            try {
+                const response = await fetch(`${API_URL}/decks.php`, {
+                    method: 'POST',
+                    body: JSON.stringify({ title, user_id: state.user.id })
+                });
+                if (response.ok) {
+                    fetchDecks();
+                }
+            } catch (error) {
+                console.error('Create deck error:', error);
+            }
+        }
+
+        async function deleteDeck(id) {
+            if (!confirm('Tem certeza que deseja excluir este deck?')) return;
+            try {
+                const response = await fetch(`${API_URL}/decks.php`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id, user_id: state.user.id })
+                });
+                if (response.ok) {
+                    fetchDecks();
+                }
+            } catch (error) {
+                console.error('Delete deck error:', error);
+            }
+        }
+
+        async function openDeck(id) {
+            try {
+                const response = await fetch(`${API_URL}/decks.php?id=${id}&user_id=${state.user.id}`);
+                const data = await response.json();
+                if (response.ok) {
+                    state.currentDeck = data;
+                    state.currentCardIndex = 0;
+                    state.isFlipped = false;
+                    showFlashcards();
+                }
+            } catch (error) {
+                console.error('Open deck error:', error);
+            }
+        }
+
+        // UI Functions
+        function showAuth() {
+            authSection.classList.remove('hidden');
+            appSection.classList.add('hidden');
+            deckListArea.classList.add('hidden');
+            appContent.classList.remove('active');
+            // if (editorSection) editorSection.classList.remove('active');
+            // // Clear login/register forms to remove persisted input when showing auth
+            // try {
+            //     if (loginForm && typeof loginForm.reset === 'function') loginForm.reset();
+            //     if (registerForm && typeof registerForm.reset === 'function') registerForm.reset();
+            // } catch (e) {
+            // fallback: clear individual fields if reset is not available
+            const lu = document.getElementById('loginUser');
+            const lp = document.getElementById('loginPass');
+            // if (lu) lu.value = '';
+            // if (lp) lp.value = '';
+            lu.value = '';
+            lp.value = '';
+            const ru = document.getElementById('regUser');
+            const rp = document.getElementById('regPass');
+            // if (ru) ru.value = '';
+            // if (rp) rp.value = '';
+            ru.value = '';
+            rp.value = '';
+            // }
+        }
+
+        function showApp() {
+            authSection.classList.add('hidden');
+            appSection.classList.remove('hidden');
+            deckListArea.classList.remove('hidden');
+            appContent.classList.remove('active');
+            if (editorSection) editorSection.classList.remove('active');
+            fetchDecks();
+            document.getElementById('welcomeUser').textContent = `Olá, ${state.user.username}`;
+        }
+
+        function showFlashcards() {
+            deckListArea.classList.add('hidden');
+            appContent.classList.add('active');
+            renderCard();
+            updateProgress();
+        }
+
+        function renderDeckList() {
+            deckList.innerHTML = '';
+            state.decks.forEach(deck => {
+                const div = document.createElement('div');
+                div.className = 'deck-item';
+                div.innerHTML = `
+                    <div class="deck-item-title">${deck.title}</div>
+                    <div class="deck-item-actions">
+                        <button class="deck-item-btn" onclick="openDeck(${deck.id})">Abrir</button>
+                        <button class="deck-item-btn" onclick="deleteDeck(${deck.id})" style="color:red; border-color:red;">Excluir</button>
+                    </div>
+                `;
+                deckList.appendChild(div);
+            });
+        }
+
+        function renderCard() {
+            if (!state.currentDeck || !state.currentDeck.cards || state.currentDeck.cards.length === 0) {
+                document.getElementById('cardText').textContent = "Deck vazio";
+                return;
+            }
+            const card = state.currentDeck.cards[state.currentCardIndex];
+
+            // Default
+            document.getElementById('cardText').textContent = card.side1;
+            document.getElementById('cardLabel').textContent = ""; // Side 1
+
+            // const sideLabels = [
+            //     { label: 'Kanji', description: 'Japonês com kanji' },
+            //     { label: 'Hiragana', description: 'Pronúncia em hiragana/katakana' },
+            //     { label: 'Rōmaji', description: 'Pronúncia romanizada' },
+            //     { label: 'Português', description: 'Tradução' }
+            // ];
+
+            // Reset active side button
+            document.querySelectorAll('.side-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.side-btn[data-side="1"]').classList.add('active');
+        }
+
+        function updateProgress() {
+            if (!state.currentDeck || !state.currentDeck.cards) return;
+            const total = state.currentDeck.cards.length;
+            const current = state.currentCardIndex + 1;
+            const percent = (current / total) * 100;
+
+            document.getElementById('progressText').textContent = `Card ${current} de ${total}`;
+            document.getElementById('progressPercent').textContent = `${Math.round(percent)}%`;
+            document.getElementById('progressFill').style.width = `${percent}%`;
+        }
+
+        // Event Listeners
+        document.getElementById('loginBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('loginUser');
+            const pass = document.getElementById('loginPass');
+            login(user.value, pass.value);
+            user.value = '';
+            pass.value = '';
+        });
+
+        document.getElementById('registerBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const user = document.getElementById('regUser').value;
+            const pass = document.getElementById('regPass').value;
+            register(user, pass);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+
+        document.getElementById('createNewDeckBtn').addEventListener('click', () => {
+            const title = prompt("Nome do novo deck:");
+            if (title) createDeck(title);
+        });
+
+        document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
+
+        function toggleAuthMode() {
+            loginForm.classList.toggle('hidden');
+            registerForm.classList.toggle('hidden');
+        }
+
+        // Navigation
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (state.currentDeck && state.currentCardIndex < state.currentDeck.cards.length - 1) {
+                state.currentCardIndex++;
+                renderCard();
+                updateProgress();
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (state.currentDeck && state.currentCardIndex > 0) {
+                state.currentCardIndex--;
+                renderCard();
+                updateProgress();
+            }
+        });
+
+        document.getElementById('newDeckBtn').addEventListener('click', () => {
+            appContent.classList.remove('active');
+            deckListArea.classList.remove('hidden');
+        });
+
+        // Side buttons
+        document.querySelectorAll('.side-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const side = e.target.dataset.side;
+                const card = state.currentDeck.cards[state.currentCardIndex];
+                document.getElementById('cardText').textContent = card[`side${side}`];
+
+                document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+            });
+        });
+
+        // --- Missing Logic Appended ---
+
+        // Deck Actions
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const ttsBtn = document.getElementById('ttsBtn');
+        const editDeckBtn = document.getElementById('editDeckBtn');
+
+        if (shuffleBtn) {
+            shuffleBtn.addEventListener('click', () => {
+                if (!state.currentDeck || !state.currentDeck.cards) return;
+                for (let i = state.currentDeck.cards.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [state.currentDeck.cards[i], state.currentDeck.cards[j]] = [state.currentDeck.cards[j], state.currentDeck.cards[i]];
+                }
+                state.currentCardIndex = 0;
+                renderCard();
+                updateProgress();
+            });
+        }
+
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                state.currentCardIndex = 0;
+                renderCard();
+                updateProgress();
+            });
+        }
+
+        // TTS
+        let voices = [];
+        const voiceSelect = document.getElementById('voiceSelect');
+        const rateInput = document.getElementById('rate');
+        const pitchInput = document.getElementById('pitch');
+        const rateValue = document.getElementById('rateValue');
+        const pitchValue = document.getElementById('pitchValue');
+
+        function isJapaneseVoice(voice) {
+            return voice && voice.lang && voice.lang.toLowerCase().startsWith('ja');
+        }
+
+        function loadVoices() {
+            voices = speechSynthesis.getVoices() || [];
+            if (!voiceSelect) return;
+            voiceSelect.innerHTML = '';
+
+            // Prioritize Japanese voices; if none, list all voices as fallback
+            const jap = voices.filter(isJapaneseVoice);
+            const list = jap.length ? jap : voices;
+
+            list.forEach((voice) => {
+                const option = document.createElement('option');
+                // store the index from the global voices array so selection maps correctly
+                option.value = voices.indexOf(voice);
+                option.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(option);
+            });
+
+            if (voiceSelect.options.length) voiceSelect.selectedIndex = 0;
+        }
+
+        speechSynthesis.onvoiceschanged = loadVoices;
+        // attempt initial load; on many Android devices this will populate only after user interaction
+        setTimeout(loadVoices, 0);
+
+        if (ttsBtn) {
+            ttsBtn.addEventListener('click', async () => {
+                const text = document.getElementById('cardText').textContent || '';
+                if (!text) return;
+
+                // ensure voices are loaded after this user gesture
+                if (!voices.length) {
+                    loadVoices();
+                    // small delay to allow the browser to populate voices list
+                    await new Promise(r => setTimeout(r, 200));
+                }
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+
+                utterance.rate = parseFloat(rateInput?.value || 1);
+                utterance.pitch = parseFloat(pitchInput?.value || 1);
+
+                // Determine selected voice from select element (value is global index)
+                let selectedVoice = null;
+                if (voiceSelect && voiceSelect.value) {
+                    const idx = parseInt(voiceSelect.value, 10);
+                    if (!Number.isNaN(idx) && voices[idx]) selectedVoice = voices[idx];
+                }
+
+                // Fallback: pick first Japanese voice, otherwise first available
+                if (!selectedVoice) selectedVoice = voices.find(isJapaneseVoice) || voices[0] || null;
+                if (selectedVoice) utterance.voice = selectedVoice;
+
+                utterance.onstart = () => console.log('TTS started', utterance.voice && utterance.voice.name);
+                utterance.onerror = (e) => console.error('TTS error', e);
+                utterance.onend = () => console.log('TTS ended');
+
+                try { speechSynthesis.cancel(); } catch (e) { }
+                speechSynthesis.speak(utterance);
+            });
+        }
+
+        if (rateInput) rateInput.addEventListener('input', () => rateValue.textContent = rateInput.value + 'x');
+        if (pitchInput) pitchInput.addEventListener('input', () => pitchValue.textContent = pitchInput.value);
+
+        // --- Editor Logic ---
+        const editorSection = document.getElementById('editorSection');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const saveDeckBtn = document.getElementById('saveDeckBtn');
+        const addCardBtn = document.getElementById('addCardBtn');
+        const editorCardList = document.getElementById('editorCardList');
+        const editDeckTitle = document.getElementById('editDeckTitle');
+
+        if (editDeckBtn) {
+            editDeckBtn.addEventListener('click', showEditor);
+        }
+
+        function showEditor() {
+            appContent.classList.remove('active');
+            editorSection.classList.add('active');
+
+            editDeckTitle.value = state.currentDeck.title;
+            renderEditorCards();
+        }
+
+        if (cancelEditBtn) {
+            cancelEditBtn.addEventListener('click', () => {
+                editorSection.classList.remove('active');
+                appContent.classList.add('active');
+            });
+        }
+
+        function renderEditorCards() {
+            editorCardList.innerHTML = '';
+            state.currentDeck.cards.forEach((card, index) => {
+                const cardItem = document.createElement('div');
+                cardItem.className = 'editor-card-item';
+                cardItem.innerHTML = `
+                    <div class="editor-card-header">
+                        <span class="editor-card-title">Card ${index + 1}</span>
+                        <button class="delete-btn" onclick="deleteCard(${index})">🗑️</button>
+                    </div>
+                    <div class="input-group">
+                        <label>Lado 1 (Kanji/Principal)</label>
+                        <input type="text" value="${card.side1 || ''}" onchange="updateCardData(${index}, 'side1', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Lado 2 (Hiragana/Leitura)</label>
+                        <input type="text" value="${card.side2 || ''}" onchange="updateCardData(${index}, 'side2', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Lado 3 (Romaji)</label>
+                        <input type="text" value="${card.side3 || ''}" onchange="updateCardData(${index}, 'side3', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Lado 4 (Tradução)</label>
+                        <input type="text" value="${card.side4 || ''}" onchange="updateCardData(${index}, 'side4', this.value)">
+                    </div>
+                `;
+                editorCardList.appendChild(cardItem);
+            });
+        }
+
+        // Global functions for inline onclicks
+        window.deleteCard = (index) => {
+            if (confirm('Excluir este card?')) {
+                state.currentDeck.cards.splice(index, 1);
+                renderEditorCards();
+            }
+        };
+
+        window.updateCardData = (index, field, value) => {
+            state.currentDeck.cards[index][field] = value;
+        };
+
+        if (addCardBtn) {
+            addCardBtn.addEventListener('click', () => {
+                state.currentDeck.cards.push({
+                    side1: '',
+                    side2: '',
+                    side3: '',
+                    side4: ''
+                });
+                renderEditorCards();
+                setTimeout(() => {
+                    editorCardList.scrollTop = editorCardList.scrollHeight;
+                }, 100);
+            });
+        }
+
+        if (saveDeckBtn) {
+            saveDeckBtn.addEventListener('click', async () => {
+                const newTitle = editDeckTitle.value;
+                const cards = state.currentDeck.cards;
+
+                try {
+                    const response = await fetch(`${API_URL}/decks.php`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            id: state.currentDeck.id,
+                            title: newTitle,
+                            user_id: state.user.id,
+                            cards: cards
+                        })
+                    });
+
+                    if (response.ok) {
+                        alert('Deck salvo com sucesso!');
+                        state.currentDeck.title = newTitle;
+
+                        editorSection.classList.remove('active');
+                        appContent.classList.add('active');
+
+                        document.getElementById('deckTitle').textContent = newTitle;
+                        renderCard();
+                        fetchDecks(); // Refresh list
+                    } else {
+                        alert('Erro ao salvar deck.');
+                    }
+                } catch (error) {
+                    console.error('Save deck error:', error);
+                    alert('Erro ao conectar com o servidor.');
+                }
+            });
+        }
+    </script>
+
 </body>
 
 </html>
