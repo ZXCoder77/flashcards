@@ -9,6 +9,85 @@ const state = {
     isFlipped: false
 };
 
+// ...
+
+// Navigation detection helpers: detect reloads, back/forward and bfcache restores
+window.navigationInfo = {
+    type: null, // 'navigate' | 'reload' | 'back_forward' | 'prerender' | 'reload_fallback'
+    restoredFromBFCache: false,
+    isReload: false
+};
+
+function detectNavigation() {
+    try {
+        const entries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+        const nav = entries && entries[0];
+        if (nav) {
+            window.navigationInfo.type = nav.type; // standard: 'navigate'|'reload'|'back_forward'|'prerender'
+            window.navigationInfo.isReload = nav.type === 'reload';
+            return;
+        }
+
+        // Fallback for older browsers (deprecated API)
+        if (performance.navigation) {
+            const t = performance.navigation.type;
+            if (t === 1) window.navigationInfo.type = 'reload';
+            else if (t === 2) window.navigationInfo.type = 'back_forward';
+            else window.navigationInfo.type = 'navigate';
+            window.navigationInfo.isReload = (t === 1);
+        }
+    } catch (e) {
+        console.warn('detectNavigation error', e);
+    }
+}
+
+// On load try to detect navigation type. Use sessionStorage fallback if needed.
+window.addEventListener('load', () => {
+    detectNavigation();
+
+    // Fallback: if a recent beforeunload was recorded, assume reload (useful for some mobile cases)
+    try {
+        const last = sessionStorage.getItem('__last_unload_ts');
+        if (last) {
+            const delta = Date.now() - parseInt(last, 10);
+            // if the unload happened very recently (<5s) and we don't have a navigation type, assume reload
+            if (delta < 5000 && !window.navigationInfo.type) {
+                window.navigationInfo.type = 'reload_fallback';
+                window.navigationInfo.isReload = true;
+            }
+            sessionStorage.removeItem('__last_unload_ts');
+        }
+    } catch (e) {
+        // ignore storage errors
+    }
+
+    // expose for debugging in console
+    console.log('navigationInfo (load):', window.navigationInfo);
+});
+
+// pageshow handles bfcache restores (e.persisted === true)
+window.addEventListener('pageshow', (e) => {
+    if (e && e.persisted) {
+        window.navigationInfo.restoredFromBFCache = true;
+        console.log('Page restored from bfcache');
+    }
+    detectNavigation();
+    console.log('navigationInfo (pageshow):', window.navigationInfo);
+});
+
+// beforeunload: store a timestamp to help fallback detection of reloads
+window.addEventListener('beforeunload', () => {
+    try { sessionStorage.setItem('__last_unload_ts', Date.now().toString()); } catch (e) {}
+});
+
+// visibilitychange can provide hints (tab switch, backgrounding)
+document.addEventListener('visibilitychange', () => {
+    // example: if the page becomes hidden then visible quickly, may be a refresh or tab restore
+    // leaving empty here but available for custom logic
+});
+
+// ...
+
 // DOM Elements
 const authSection = document.getElementById('authSection');
 const appSection = document.getElementById('appSection');
@@ -130,7 +209,26 @@ function showAuth() {
     appSection.classList.add('hidden');
     deckListArea.classList.add('hidden');
     appContent.classList.remove('active');
-    if (editorSection) editorSection.classList.remove('active');
+    // if (editorSection) editorSection.classList.remove('active');
+    // // Clear login/register forms to remove persisted input when showing auth
+    // try {
+    //     if (loginForm && typeof loginForm.reset === 'function') loginForm.reset();
+    //     if (registerForm && typeof registerForm.reset === 'function') registerForm.reset();
+    // } catch (e) {
+        // fallback: clear individual fields if reset is not available
+        const lu = document.getElementById('loginUser');
+        const lp = document.getElementById('loginPass');
+        // if (lu) lu.value = '';
+        // if (lp) lp.value = '';
+        lu.value = '';
+        lp.value = '';
+        const ru = document.getElementById('regUser');
+        const rp = document.getElementById('regPass');
+        // if (ru) ru.value = '';
+        // if (rp) rp.value = '';
+        ru.value = '';
+        rp.value = '';
+    // }
 }
 
 function showApp() {
@@ -195,9 +293,11 @@ function updateProgress() {
 // Event Listeners
 document.getElementById('loginBtn').addEventListener('click', (e) => {
     e.preventDefault();
-    const user = document.getElementById('loginUser').value;
-    const pass = document.getElementById('loginPass').value;
-    login(user, pass);
+    const user = document.getElementById('loginUser');
+    const pass = document.getElementById('loginPass');
+    login(user.value, pass.value);
+    user.value= '';
+    pass.value= '';
 });
 
 document.getElementById('registerBtn').addEventListener('click', (e) => {
