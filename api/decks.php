@@ -64,10 +64,25 @@ switch ($method) {
                 echo json_encode(["message" => "Deck not found."]);
             }
         } else {
-            // Get all decks for user
-            $query = "SELECT * FROM decks WHERE user_id = ? ORDER BY title ASC";
-            $stmt = $db->prepare($query);
-            $stmt->execute([$user_id]);
+            // Get all decks for user, optionally filtered by group
+            $group_id = isset($_GET['group_id']) ? $_GET['group_id'] : null;
+
+            if ($group_id !== null && $group_id !== '') {
+                if ($group_id === 'null') {
+                    $query = "SELECT * FROM decks WHERE user_id = ? AND group_id IS NULL ORDER BY title ASC";
+                    $stmt = $db->prepare($query);
+                    $stmt->execute([$user_id]);
+                } else {
+                    $query = "SELECT * FROM decks WHERE user_id = ? AND group_id = ? ORDER BY title ASC";
+                    $stmt = $db->prepare($query);
+                    $stmt->execute([$user_id, $group_id]);
+                }
+            } else {
+                $query = "SELECT * FROM decks WHERE user_id = ? ORDER BY title ASC";
+                $stmt = $db->prepare($query);
+                $stmt->execute([$user_id]);
+            }
+
             $decks = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($decks);
         }
@@ -98,13 +113,15 @@ switch ($method) {
             }
 
             if (!$is_update) {
-                $query = "INSERT INTO decks SET title = :title, user_id = :user_id";
+                $query = "INSERT INTO decks SET title = :title, user_id = :user_id, group_id = :group_id";
                 $stmt = $db->prepare($query);
 
                 $data->title = htmlspecialchars(strip_tags($data->title));
+                $group_id = isset($data->group_id) ? ($data->group_id === 'null' || $data->group_id === '' ? null : $data->group_id) : null;
 
                 $stmt->bindParam(":title", $data->title);
                 $stmt->bindParam(":user_id", $user_id);
+                $stmt->bindParam(":group_id", $group_id);
 
                 if ($stmt->execute()) {
                     $deck_id = $db->lastInsertId();
@@ -147,13 +164,15 @@ switch ($method) {
             $checkStmt->execute([$data->id, $user_id]);
 
             if ($checkStmt->rowCount() > 0) {
-                $query = "UPDATE decks SET title = :title WHERE id = :id";
+                $query = "UPDATE decks SET title = :title, group_id = :group_id WHERE id = :id";
                 $stmt = $db->prepare($query);
 
                 $data->title = htmlspecialchars(strip_tags($data->title));
+                $group_id = isset($data->group_id) ? ($data->group_id === 'null' || $data->group_id === '' ? null : $data->group_id) : null;
 
                 $stmt->bindParam(":title", $data->title);
                 $stmt->bindParam(":id", $data->id);
+                $stmt->bindParam(":group_id", $group_id);
 
                 if ($stmt->execute()) {
                     // Update cards logic could be complex (delete all and re-insert, or update individually)

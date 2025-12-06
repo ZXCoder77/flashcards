@@ -711,6 +711,31 @@
         .update-btn:hover {
             background: #2980b9;
         }
+
+        /* Group Modal Styles */
+        .group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #e9ecef;
+        }
+
+        .group-item input {
+            border: 1px solid transparent;
+            background: transparent;
+            font-size: 1rem;
+            padding: 5px;
+            color: #2c3e50;
+        }
+
+        .group-item input:focus {
+            border-color: #3498db;
+            background: white;
+            outline: none;
+        }
     </style>
 </head>
 
@@ -719,7 +744,7 @@
         <div class="header">
             <h1>日本語 Flashcards</h1>
             <!--<p>Estude japonês com flashcards interativos</p>-->
-            <small>versão 1.251202.1514</small>
+            <small>versão 1.251206.0844</small>
         </div>
 
         <!-- Auth Section -->
@@ -776,10 +801,23 @@
             <!-- Deck List State -->
             <div id="deckListArea">
                 <div class="deck-list-header"
-                    style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px;">
-                    <h2 style="font-size: 1.5rem; color: #34495e;">Meus Decks</h2>
-                    <button class="btn btn-primary" id="createNewDeckBtn" style="margin-left: 10px">✨ Novo Deck</button>
-                    <button class="btn btn-secondary" id="importDeckBtn" style="margin-left: 10px">📥 Importar</button>
+                    style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="font-size: 1.5rem; color: #34495e; margin-right: 10px;">Meus Decks</h2>
+                    <button class="btn btn-primary" id="createNewDeckBtn">✨ Novo Deck</button>
+                    <button class="btn btn-secondary" id="importDeckBtn">📥 Importar</button>
+
+                    <div class="group-controls"
+                        style="display: flex; align-items: center; margin-left: auto; gap: 10px;">
+                        <label for="groupSelect" style="font-weight: bold; color: #34495e;">Grupo</label>
+                        <select id="groupSelect"
+                            style="padding: 8px; border-radius: 5px; border: 2px solid #34495e; font-weight: bold; font-size: 1.1rem; min-width: 150px;">
+                            <option value="">Todos</option>
+                        </select>
+                        <button id="manageGroupsBtn" class="btn btn-outline"
+                            style="border: 2px solid #000; color: #000; font-weight: bold; padding: 5px 10px;">Editar
+                            Grupos</button>
+                    </div>
+
                     <input type="file" id="importFileInput" accept=".json" style="display: none;">
                 </div>
                 <div id="deckList" class="deck-grid">
@@ -892,6 +930,57 @@
         </div>
     </div>
 
+    <!-- Group Management Modal -->
+    <div id="groupModal" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #34495e;">Gerenciar Grupos</h2>
+                <button id="closeGroupModalBtn"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <input type="text" id="newGroupName" placeholder="Nome do novo grupo"
+                    style="flex: 1; padding: 10px; border: 1px solid #bdc3c7; border-radius: 5px;">
+                <button id="createGroupBtn" class="btn btn-primary">Adicionar</button>
+            </div>
+
+            <div id="groupList" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Groups will be listed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Deck Group Modal -->
+    <div id="changeGroupModal" class="modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="modal-content"
+            style="background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="color: #34495e;">Mudar Grupo</h3>
+                <button id="closeChangeGroupModalBtn"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <p id="changeGroupDeckTitle" style="margin-bottom: 15px; font-weight: bold; color: #2c3e50;"></p>
+
+            <div class="form-group">
+                <label>Selecione o novo grupo:</label>
+                <select id="changeGroupSelect"
+                    style="width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px;">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button id="cancelChangeGroupBtn" class="btn btn-secondary">Cancelar</button>
+                <button id="saveChangeGroupBtn" class="btn btn-primary">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Update toast (shown when a new Service Worker is waiting) -->
     <div id="updateToast" class="update-toast" aria-live="polite" role="status" style="display:none">
         <span>Nova versão disponível</span>
@@ -919,6 +1008,199 @@
         const deckListArea = document.getElementById('deckListArea');
         const appContent = document.getElementById('appContent');
         const deckList = document.getElementById('deckList');
+
+        // Group Elements
+        const groupSelect = document.getElementById('groupSelect');
+        const manageGroupsBtn = document.getElementById('manageGroupsBtn');
+        const groupModal = document.getElementById('groupModal');
+        const closeGroupModalBtn = document.getElementById('closeGroupModalBtn');
+        const newGroupName = document.getElementById('newGroupName');
+        const createGroupBtn = document.getElementById('createGroupBtn');
+        const groupList = document.getElementById('groupList');
+
+        // Group Functions
+        async function fetchGroups() {
+            if (!state.user) return;
+            try {
+                const response = await fetch(`${API_URL}/groups.php?user_id=${state.user.id}`);
+                const groups = await response.json();
+                if (response.ok) {
+                    renderGroupOptions(groups);
+                    renderGroupList(groups);
+                }
+            } catch (error) {
+                console.error('Fetch groups error:', error);
+            }
+        }
+
+        function renderGroupOptions(groups) {
+            const currentVal = groupSelect.value;
+            groupSelect.innerHTML = '<option value="">Todos</option>';
+            const noGroupOption = document.createElement('option');
+            noGroupOption.value = 'null';
+            noGroupOption.textContent = 'Sem Grupo';
+            groupSelect.appendChild(noGroupOption);
+
+            groups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.id;
+                option.textContent = group.name;
+                groupSelect.appendChild(option);
+            });
+            // Restore selection if still valid (or empty)
+            groupSelect.value = currentVal;
+        }
+
+        function renderGroupList(groups) {
+            groupList.innerHTML = '';
+            groups.forEach(group => {
+                const item = document.createElement('div');
+                item.className = 'group-item';
+                item.innerHTML = `
+                    <input type="text" value="${group.name}" onchange="updateGroup(${group.id}, this.value)">
+                    <button class="delete-btn" onclick="deleteGroup(${group.id})">&times;</button>
+                `;
+                groupList.appendChild(item);
+            });
+        }
+
+        async function createGroup() {
+            const name = newGroupName.value.trim();
+            if (!name) return;
+            try {
+                const response = await fetch(`${API_URL}/groups.php`, {
+                    method: 'POST',
+                    body: JSON.stringify({ name, user_id: state.user.id })
+                });
+                if (response.ok) {
+                    newGroupName.value = '';
+                    fetchGroups();
+                }
+            } catch (error) {
+                console.error('Create group error:', error);
+            }
+        }
+
+        async function deleteGroup(id) {
+            if (!confirm('Excluir este grupo? Os decks ficarão sem grupo.')) return;
+            try {
+                const response = await fetch(`${API_URL}/groups.php`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id, user_id: state.user.id })
+                });
+                if (response.ok) {
+                    fetchGroups();
+                }
+            } catch (error) {
+                console.error('Delete group error:', error);
+            }
+        }
+
+        async function updateGroup(id, name) {
+            try {
+                await fetch(`${API_URL}/groups.php`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ id, name, user_id: state.user.id })
+                });
+                fetchGroups();
+            } catch (error) {
+                console.error('Update group error:', error);
+            }
+        }
+
+        // Expose to window for onclicks
+        window.deleteGroup = deleteGroup;
+        window.updateGroup = updateGroup;
+
+        // Change Group Logic
+        let deckToChangeGroup = null;
+        const changeGroupModal = document.getElementById('changeGroupModal');
+        const changeGroupSelect = document.getElementById('changeGroupSelect');
+        const changeGroupDeckTitle = document.getElementById('changeGroupDeckTitle');
+        const closeChangeGroupModalBtn = document.getElementById('closeChangeGroupModalBtn');
+        const cancelChangeGroupBtn = document.getElementById('cancelChangeGroupBtn');
+        const saveChangeGroupBtn = document.getElementById('saveChangeGroupBtn');
+
+        window.openChangeGroupModal = (deckId) => {
+            const deck = state.decks.find(d => d.id == deckId);
+            if (!deck) return;
+
+            deckToChangeGroup = deck;
+            changeGroupDeckTitle.textContent = `Deck: ${deck.title}`;
+
+            // Populate select
+            changeGroupSelect.innerHTML = '<option value="null">Sem Grupo</option>';
+            // We need to fetch groups or use existing cached groups if we had them. 
+            // For now, let's re-fetch or use logic from fetchGroups if we stored them.
+            // Since we don't store groups in state, let's fetch them freshly.
+            fetch(`${API_URL}/groups.php?user_id=${state.user.id}`)
+                .then(res => res.json())
+                .then(groups => {
+                    groups.forEach(g => {
+                        const opt = document.createElement('option');
+                        opt.value = g.id;
+                        opt.textContent = g.name;
+                        if (deck.group_id == g.id) opt.selected = true;
+                        changeGroupSelect.appendChild(opt);
+                    });
+                    changeGroupModal.style.display = 'flex';
+                });
+        };
+
+        if (closeChangeGroupModalBtn) closeChangeGroupModalBtn.onclick = () => changeGroupModal.style.display = 'none';
+        if (cancelChangeGroupBtn) cancelChangeGroupBtn.onclick = () => changeGroupModal.style.display = 'none';
+
+        if (saveChangeGroupBtn) {
+            saveChangeGroupBtn.onclick = async () => {
+                if (!deckToChangeGroup) return;
+
+                const newGroupId = changeGroupSelect.value === 'null' ? null : changeGroupSelect.value;
+
+                try {
+                    const response = await fetch(`${API_URL}/decks.php`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                            id: deckToChangeGroup.id,
+                            title: deckToChangeGroup.title, // Required by backend
+                            user_id: state.user.id,
+                            group_id: newGroupId
+                        })
+                    });
+
+                    if (response.ok) {
+                        changeGroupModal.style.display = 'none';
+                        fetchDecks(); // Refresh list to reflect changes (e.g. if filtered by group)
+                    } else {
+                        alert('Erro ao mudar grupo');
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('Erro de conexão');
+                }
+            };
+        }
+
+        // Group Event Listeners
+        if (groupSelect) {
+            groupSelect.addEventListener('change', fetchDecks);
+        }
+        if (manageGroupsBtn) {
+            manageGroupsBtn.addEventListener('click', () => {
+                groupModal.style.display = 'flex';
+                fetchGroups();
+            });
+        }
+        if (closeGroupModalBtn) {
+            closeGroupModalBtn.addEventListener('click', () => groupModal.style.display = 'none');
+        }
+        if (createGroupBtn) {
+            createGroupBtn.addEventListener('click', createGroup);
+        }
+        window.onclick = function (event) {
+            if (event.target == groupModal) {
+                groupModal.style.display = 'none';
+            }
+        }
 
         // Auth Functions
         async function login(username, password) {
@@ -970,7 +1252,13 @@
         async function fetchDecks() {
             if (!state.user) return;
             try {
-                const response = await fetch(`${API_URL}/decks.php?user_id=${state.user.id}`);
+                const groupId = groupSelect.value;
+                let url = `${API_URL}/decks.php?user_id=${state.user.id}`;
+                if (groupId) {
+                    url += `&group_id=${groupId}`;
+                }
+
+                const response = await fetch(url);
                 const data = await response.json();
                 if (response.ok) {
                     state.decks = data;
@@ -984,9 +1272,10 @@
         async function createDeck(title) {
             if (!state.user) return;
             try {
+                const groupId = groupSelect.value === 'null' ? null : groupSelect.value;
                 const response = await fetch(`${API_URL}/decks.php`, {
                     method: 'POST',
-                    body: JSON.stringify({ title, user_id: state.user.id })
+                    body: JSON.stringify({ title, user_id: state.user.id, group_id: groupId })
                 });
                 if (response.ok) {
                     fetchDecks();
@@ -1049,7 +1338,8 @@
                         body: JSON.stringify({
                             title: deckData.title,
                             cards: deckData.cards,
-                            user_id: state.user.id
+                            user_id: state.user.id,
+                            group_id: groupSelect.value === 'null' ? null : groupSelect.value,
                         })
                     });
 
@@ -1124,6 +1414,7 @@
             deckListArea.classList.remove('hidden');
             appContent.classList.remove('active');
             if (document.getElementById('editorSection')) document.getElementById('editorSection').classList.remove('active');
+            fetchGroups();
             fetchDecks();
             document.getElementById('welcomeUser').textContent = `Olá, ${state.user.username}`;
         }
@@ -1144,6 +1435,7 @@
                     <div class="deck-item-title">${deck.title}</div>
                     <div class="deck-item-actions">
                         <button class="deck-item-btn" onclick="openDeck(${deck.id})">Abrir</button>
+                        <button class="deck-item-btn" onclick="openChangeGroupModal(${deck.id})">Mudar Grupo</button>
                         <button class="deck-item-btn" onclick="exportDeck(${deck.id})">Exportar</button>
                         <button class="deck-item-btn" onclick="deleteDeck(${deck.id})" style="color:red; border-color:red;">Excluir</button>
                     </div>
@@ -1173,6 +1465,13 @@
             const total = state.currentDeck.cards.length;
             const current = state.currentCardIndex + 1;
             const percent = (current / total) * 100;
+
+            if (total == 0) {
+                document.getElementById('progressText').textContent = "Card 0 de 0";
+                document.getElementById('progressPercent').textContent = "0%";
+                document.getElementById('progressFill').style.width = "0%";
+                return;
+            }
 
             document.getElementById('progressText').textContent = `Card ${current} de ${total}`;
             document.getElementById('progressPercent').textContent = `${Math.round(percent)}%`;
@@ -1451,6 +1750,7 @@
                             id: state.currentDeck.id,
                             title: newTitle,
                             user_id: state.user.id,
+                            group_id: state.currentDeck.group_id,
                             cards: cards
                         })
                     });
