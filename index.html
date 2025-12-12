@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>日本語 Flashcards - Estudo de Japonês</title>
   <meta name="description" content="Aplicativo de flashcards para estudo da língua japonesa">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3498db">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <style>
     * {
       margin: 0;
@@ -610,6 +613,79 @@
       text-align: right;
     }
   </style>
+  <script>
+    let newWorker;
+
+    if ('serviceWorker' in navigator) {
+      // Service Workers require a secure origin (https) or localhost
+      if (window.location.protocol === 'file:') {
+        console.warn('Service Workers não são suportados no protocolo file://. Por favor, use um servidor local (http://localhost) ou HTTPS.');
+      } else {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').then(registration => {
+            console.log('SW registered:', registration);
+
+            // Check for updates periodically
+            setInterval(() => {
+              registration.update();
+            }, 60 * 60 * 1000); // Check every hour
+
+            // Check for updates when the page becomes visible
+            document.addEventListener('visibilitychange', () => {
+              if (document.visibilityState === 'visible') {
+                registration.update();
+              }
+            });
+
+            registration.addEventListener('updatefound', () => {
+              newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  showUpdateToast();
+                }
+              });
+            });
+
+            // If there's already a waiting worker, show toast
+            if (registration.waiting) {
+              newWorker = registration.waiting;
+              showUpdateToast();
+            }
+          }).catch(error => console.log('SW registration failed:', error));
+
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+              window.location.reload();
+              refreshing = true;
+            }
+          });
+        });
+      }
+    }
+
+    function showUpdateToast(worker) {
+      const toast = document.getElementById('updateToast');
+      const updateBtn = document.getElementById('updateAppBtn');
+
+      if (!toast) {
+        console.warn('showUpdateToast: #updateToast not found in DOM');
+        return;
+      }
+
+      toast.classList.add('show');
+
+      // Use onclick to avoid adding multiple listeners if showUpdateToast is called repeatedly
+      if (updateBtn) {
+        updateBtn.onclick = () => {
+          updateBtn.disabled = true;
+          try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (e) { console.error(e); }
+        };
+      } else {
+        console.warn('showUpdateToast: #updateAppBtn not found in DOM');
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -911,8 +987,14 @@
     <span id="toastMessage"></span>
   </div>
 
+  <!-- Update toast (shown when a new Service Worker is waiting) -->
+  <div id="updateToast" class="update-toast" aria-live="polite" role="status" style="display:none">
+    <span>Nova versão disponível</span>
+    <button id="updateAppBtn" class="update-btn">Atualizar</button>
+  </div>
+
   <script>
-    let version = '1.0.2';
+    let version = '1.0.3';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
