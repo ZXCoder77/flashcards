@@ -950,7 +950,7 @@
         <input type="text" class="form-input" id="cardKanji" placeholder="">
       </div>
       <div class="form-group">
-        <label class="form-label">Hiragana/Katakana *</label>
+        <label class="form-label">Hiragana / Katakana *</label>
         <input type="text" class="form-input" id="cardHiragana" placeholder="">
       </div>
       <div class="form-group">
@@ -994,7 +994,7 @@
   </div>
 
   <script>
-    let version = '1.0.3';
+    let version = '1.0.31';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
@@ -1315,7 +1315,7 @@
               <div class="card-field-value">${escapeHtml(card.kanji)}</div>
             </div>
             <div class="card-field">
-              <div class="card-field-label">Hiragana/Katakana</div>
+              <div class="card-field-label">Hiragana / Katakana</div>
               <div class="card-field-value">${escapeHtml(card.hiragana)}</div>
             </div>
             ${card.romaji ? `
