@@ -613,7 +613,7 @@
     <div id="homeView" class="view active">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.0</p>
+        <p class="version">versão 1.0.1</p>
       </div>
 
       <div class="toolbar">
@@ -621,13 +621,16 @@
           <button class="btn" onclick="openCreateGroupModal()">
             ➕ Novo Grupo
           </button>
+          <button class="btn-outline btn" onclick="importGroup()">
+            📥 Importar
+          </button>
         </div>
         <div class="toolbar-right">
           <button class="btn-outline btn" onclick="importData()">
-            📥 Importar
+            📥 Importar Tudo
           </button>
           <button class="btn-outline btn" onclick="exportAllData()">
-            📤 Exportar
+            📤 Exportar Tudo
           </button>
         </div>
       </div>
@@ -653,7 +656,7 @@
     <div id="deckListView" class="view">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.0</p>
+        <p class="version">versão 1.0.1</p>
       </div>
 
       <!--
@@ -666,7 +669,7 @@
 
       <div class="header">
         <h1 id="groupTitle"></h1>
-        <p id="groupDescription" class="version"></p>
+        <p id="groupDescriptionDisplay" class="version"></p>
       </div>
 
       <div class="toolbar">
@@ -688,7 +691,7 @@
     <div id="cardEditorView" class="view">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.0</p>
+        <p class="version">versão 1.0.1</p>
       </div>
 
       <!--
@@ -720,7 +723,7 @@
     <div id="studyView" class="view">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.0</p>
+        <p class="version">versão 1.0.1</p>
       </div>
 
       <div class="progress-text" id="progressText">Card 1 de 0 0%</div>
@@ -1104,6 +1107,7 @@
           <div class="card-header">
             <h3 class="card-title">${escapeHtml(group.name)}</h3>
             <div class="card-actions">
+              <button class="icon-btn" onclick="exportGroup('${group.id}')" title="Exportar">📤</button>
               <button class="icon-btn" onclick="openEditGroupModal('${group.id}')" title="Editar">✏️</button>
               <button class="icon-btn" onclick="confirmDeleteGroup('${group.id}')" title="Excluir">🗑️</button>
             </div>
@@ -1131,7 +1135,7 @@
       }
 
       document.getElementById('groupTitle').textContent = group.name;
-      document.getElementById('groupDescription').textContent = group.description || '';
+      document.getElementById('groupDescriptionDisplay').textContent = group.description || '';
 
       const decks = appState.decks.filter(d => d.groupId === appState.currentGroupId);
       const container = document.getElementById('decksList');
@@ -1677,6 +1681,93 @@
       } catch (error) {
         showToast('Erro ao exportar deck', 'error');
       }
+    }
+
+    function exportGroup(groupId) {
+      try {
+        const group = appState.groups.find(g => g.id === groupId);
+        if (!group) {
+          showToast('Grupo não encontrado', 'error');
+          return;
+        }
+
+        // Get all decks that belong to this group
+        const groupDecks = appState.decks.filter(d => d.groupId === groupId);
+
+        const data = {
+          group: group,
+          decks: groupDecks
+        };
+
+        const json = JSON.stringify(data, null, 2);
+        downloadFile(json, `group-${group.name.replace(/\s+/g, '-')}-${getDateString()}.json`, 'application/json');
+        showToast('Grupo exportado com sucesso', 'success');
+      } catch (error) {
+        showToast('Erro ao exportar grupo', 'error');
+      }
+    }
+
+    function importGroup() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+
+            if (!data.group || !data.decks) {
+              showToast('Formato de grupo inválido', 'error');
+              return;
+            }
+
+            // Create new group with new ID
+            const newGroup = {
+              id: generateId(),
+              name: data.group.name,
+              description: data.group.description || '',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+
+            appState.groups.push(newGroup);
+
+            // Import all decks from the group
+            let totalCards = 0;
+            data.decks.forEach(deckData => {
+              const newDeck = {
+                id: generateId(),
+                name: deckData.name,
+                description: deckData.description || '',
+                groupId: newGroup.id,
+                cards: deckData.cards.map(card => ({
+                  id: generateId(),
+                  kanji: card.kanji,
+                  hiragana: card.hiragana,
+                  romaji: card.romaji || '',
+                  portuguese: card.portuguese
+                })),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              };
+              totalCards += newDeck.cards.length;
+              appState.decks.push(newDeck);
+            });
+
+            saveData();
+            renderGroupsList();
+            showToast(`Grupo "${newGroup.name}" importado com ${data.decks.length} deck(s) e ${totalCards} card(s)`, 'success');
+          } catch (error) {
+            showToast('Erro ao importar grupo. Verifique o formato do arquivo.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
     }
 
     function importData() {
