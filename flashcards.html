@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日本語 Flashcards - Estudo de Japonês</title>
+  <meta name="description" content="Aplicativo de flashcards para estudo da língua japonesa">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #E8E4D9;
+      color: #2C3E50;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      color: #2C3E50;
+      margin-bottom: 5px;
+    }
+
+    .header .version {
+      font-size: 0.875rem;
+      color: #7f8c8d;
+    }
+
+    .btn {
+      background-color: #4A90E2;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background-color: #357ABD;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-outline {
+      background-color: white;
+      color: #4A90E2;
+      border: 2px solid #4A90E2;
+    }
+
+    .btn-outline:hover {
+      background-color: #f0f7ff;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+    }
+
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2C3E50;
+    }
+
+    .card-description {
+      color: #7f8c8d;
+      margin-bottom: 12px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+      color: #7f8c8d;
+    }
+
+    .icon-btn:hover {
+      background-color: #f0f0f0;
+      color: #2C3E50;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2C3E50;
+      margin-bottom: 8px;
+    }
+
+    .modal-description {
+      color: #7f8c8d;
+      font-size: 0.875rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #2C3E50;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #4A90E2;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: #ddd;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #4A90E2;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 0.875rem;
+      color: #7f8c8d;
+      margin-bottom: 16px;
+    }
+
+    .flashcard-display {
+      background: white;
+      border-radius: 12px;
+      padding: 60px 40px;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      margin-bottom: 24px;
+    }
+
+    .flashcard-text {
+      font-size: 3rem;
+      font-weight: 600;
+      text-align: center;
+      word-break: break-word;
+      color: #2C3E50;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .button-group .btn {
+      flex: 1;
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .slider-container {
+      margin: 20px 0;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      color: #7f8c8d;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4A90E2;
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #4A90E2;
+      cursor: pointer;
+      border: none;
+    }
+
+    .collapsible {
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .collapsible-trigger {
+      width: 100%;
+      padding: 16px;
+      background: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #2C3E50;
+    }
+
+    .collapsible-trigger:hover {
+      background-color: #f8f9fa;
+    }
+
+    .collapsible-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .collapsible-content.active {
+      max-height: 1000px;
+    }
+
+    .collapsible-inner {
+      padding: 24px;
+      background: white;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-state-title {
+      font-size: 1.25rem;
+      color: #7f8c8d;
+      margin-bottom: 8px;
+    }
+
+    .empty-state-description {
+      color: #95a5a6;
+      font-size: 0.875rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 2000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.active {
+      display: flex;
+    }
+
+    .toast.success {
+      border-left: 4px solid #27ae60;
+    }
+
+    .toast.error {
+      border-left: 4px solid #e74c3c;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .flashcard-text {
+        font-size: 2rem;
+      }
+
+      .flashcard-display {
+        padding: 40px 20px;
+        min-height: 300px;
+      }
+
+      .button-group .btn {
+        min-width: 120px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        flex-direction: column;
+      }
+
+      .toolbar-left,
+      .toolbar-right {
+        width: 100%;
+      }
+
+      .toolbar-left .btn,
+      .toolbar-right .btn {
+        flex: 1;
+      }
+    }
+
+    .nav-breadcrumb {
+      margin-bottom: 24px;
+    }
+
+    .nav-breadcrumb .btn {
+      padding: 8px 16px;
+      font-size: 0.875rem;
+    }
+
+    .card-list-item {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-list-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-list-item-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #2C3E50;
+    }
+
+    .card-list-item-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .card-field {
+      padding: 12px;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+    }
+
+    .card-field-label {
+      font-size: 0.75rem;
+      color: #7f8c8d;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .card-field-value {
+      font-size: 1rem;
+      color: #2C3E50;
+      word-break: break-word;
+    }
+
+    .storage-indicator {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .storage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .storage-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #2C3E50;
+    }
+
+    .storage-stats {
+      font-size: 0.875rem;
+      color: #7f8c8d;
+    }
+
+    .storage-bar {
+      width: 100%;
+      height: 8px;
+      background-color: #e8e8e8;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .storage-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4A90E2, #357ABD);
+      transition: width 0.3s ease, background 0.3s ease;
+      border-radius: 4px;
+    }
+
+    .storage-bar-fill.warning {
+      background: linear-gradient(90deg, #f39c12, #e67e22);
+    }
+
+    .storage-bar-fill.danger {
+      background: linear-gradient(90deg, #e74c3c, #c0392b);
+    }
+
+    .storage-details {
+      font-size: 0.75rem;
+      color: #95a5a6;
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Home View -->
+    <div id="homeView" class="view active">
+      <div class="header">
+        <h1>日本語 Flashcards</h1>
+        <p class="version">versão 1.0.0</p>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <button class="btn" onclick="openCreateGroupModal()">
+            ➕ Novo Grupo
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn-outline btn" onclick="importData()">
+            📥 Importar
+          </button>
+          <button class="btn-outline btn" onclick="exportAllData()">
+            📤 Exportar
+          </button>
+        </div>
+      </div>
+
+      <!-- Storage Indicator -->
+      <div class="storage-indicator">
+        <div class="storage-header">
+          <span class="storage-title">💾 Armazenamento</span>
+          <span class="storage-stats" id="storageStats">Calculando...</span>
+        </div>
+        <div class="storage-bar">
+          <div class="storage-bar-fill" id="storageBarFill" style="width: 0%"></div>
+        </div>
+        <div class="storage-details" id="storageDetails">
+          Espaço disponível no navegador
+        </div>
+      </div>
+
+      <div id="groupsList" class="grid"></div>
+    </div>
+
+    <!-- Deck List View -->
+    <div id="deckListView" class="view">
+      <div class="header">
+        <h1>日本語 Flashcards</h1>
+        <p class="version">versão 1.0.0</p>
+      </div>
+
+      <!--
+      <div class="nav-breadcrumb">
+        <button class="btn-outline btn" onclick="navigateToHome()">
+          ← Voltar Grupos
+        </button>
+      </div>
+      -->
+
+      <div class="header">
+        <h1 id="groupTitle"></h1>
+        <p id="groupDescription" class="version"></p>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn" onclick="openCreateDeckModal()">
+          ➕ Novo Deck
+        </button>
+        <button class="btn-outline btn" onclick="importDeck()">
+          📥 Importar Deck
+        </button>
+        <button class="btn-outline btn" onclick="navigateToHome()">
+          ← Voltar Grupos
+        </button>
+      </div>
+
+      <div id="decksList" class="grid"></div>
+    </div>
+
+    <!-- Card Editor View -->
+    <div id="cardEditorView" class="view">
+      <div class="header">
+        <h1>日本語 Flashcards</h1>
+        <p class="version">versão 1.0.0</p>
+      </div>
+
+      <!--
+      <div class="nav-breadcrumb">
+        <button class="btn-outline btn" onclick="navigateToDecks()">
+          ← Voltar Decks
+        </button>
+      </div>
+      -->
+
+      <div class="header">
+        <h1 id="deckTitleEditor"></h1>
+        <p class="version">Editar Cards</p>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn" onclick="openCreateCardModal()">
+          ➕ Novo Card
+        </button>
+        <button class="btn-outline btn" onclick="navigateToDecks()">
+          ← Voltar Decks
+        </button>
+      </div>
+
+      <div id="cardsList"></div>
+    </div>
+
+    <!-- Study View -->
+    <div id="studyView" class="view">
+      <div class="header">
+        <h1>日本語 Flashcards</h1>
+        <p class="version">versão 1.0.0</p>
+      </div>
+
+      <div class="progress-text" id="progressText">Card 1 de 0 0%</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-outline btn" onclick="navigateToDecks()">
+          ← Voltar Decks
+        </button>
+        <button class="btn-outline btn" onclick="navigateToCardEditor()">
+          ✏️ Editar Deck
+        </button>
+        <button class="btn-outline btn" onclick="shuffleCards()">
+          🔀 Misturar
+        </button>
+        <button class="btn-outline btn" onclick="restartStudy()">
+          🔄 Reiniciar
+        </button>
+      </div>
+
+      <div class="flashcard-display">
+        <div class="flashcard-text" id="flashcardText">Carregando...</div>
+      </div>
+
+      <div class="button-group">
+        <button class="btn" id="btnKanji" onclick="setDisplayMode('kanji')">Kanji</button>
+        <button class="btn-outline btn" id="btnHiragana" onclick="setDisplayMode('hiragana')">Hiragana</button>
+        <button class="btn-outline btn" id="btnRomaji" onclick="setDisplayMode('romaji')">Rômaji</button>
+        <button class="btn-outline btn" id="btnPortuguese" onclick="setDisplayMode('portuguese')">Português</button>
+      </div>
+
+      <div class="button-group">
+        <button class="btn-outline btn" onclick="previousCard()" id="btnPrevious">
+          ← Anterior
+        </button>
+        <button class="btn-outline btn" onclick="nextCard()" id="btnNext">
+          Próximo →
+        </button>
+        <button class="btn" onclick="speakCard()">
+          🔊 Ouvir
+        </button>
+      </div>
+
+      <div class="collapsible">
+        <button class="collapsible-trigger" onclick="toggleVoiceSettings()">
+          <span>Configurações de Voz</span>
+          <span id="voiceSettingsIcon">⚙️</span>
+        </button>
+        <div class="collapsible-content" id="voiceSettingsContent">
+          <div class="collapsible-inner">
+            <div class="form-group">
+              <label class="form-label">Voz</label>
+              <select class="form-select" id="voiceSelect" onchange="updateVoiceSettings()"></select>
+            </div>
+
+            <div class="slider-container">
+              <div class="slider-header">
+                <label class="form-label">Velocidade</label>
+                <span id="rateValue">1x</span>
+              </div>
+              <input type="range" class="slider" id="rateSlider" min="0.5" max="2" step="0.1" value="1"
+                oninput="updateRate(this.value)">
+              <div class="slider-labels">
+                <span>Lento</span>
+                <span>Rápido</span>
+              </div>
+            </div>
+
+            <div class="slider-container">
+              <div class="slider-header">
+                <label class="form-label">Tom</label>
+                <span id="pitchValue">1</span>
+              </div>
+              <input type="range" class="slider" id="pitchSlider" min="0.5" max="2" step="0.1" value="1"
+                oninput="updatePitch(this.value)">
+              <div class="slider-labels">
+                <span>Grave</span>
+                <span>Agudo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- Create/Edit Group Modal -->
+  <div id="groupModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="groupModalTitle">Criar Novo Grupo</h2>
+        <p class="modal-description">Crie um novo grupo para organizar seus decks de estudo</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input type="text" class="form-input" id="groupName" placeholder="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <textarea class="form-textarea" id="groupDescription" placeholder=""></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline btn" onclick="closeGroupModal()">Cancelar</button>
+        <button class="btn" onclick="saveGroup()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create/Edit Deck Modal -->
+  <div id="deckModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="deckModalTitle">Criar Novo Deck</h2>
+        <p class="modal-description">Crie um novo deck de flashcards para estudo</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nome *</label>
+        <input type="text" class="form-input" id="deckName" placeholder="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <textarea class="form-textarea" id="deckDescription" placeholder=""></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline btn" onclick="closeDeckModal()">Cancelar</button>
+        <button class="btn" onclick="saveDeck()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create/Edit Card Modal -->
+  <div id="cardModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="cardModalTitle">Criar Novo Card</h2>
+        <p class="modal-description">Adicione um novo flashcard ao deck</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kanji *</label>
+        <input type="text" class="form-input" id="cardKanji" placeholder="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hiragana/Katakana *</label>
+        <input type="text" class="form-input" id="cardHiragana" placeholder="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rômaji</label>
+        <input type="text" class="form-input" id="cardRomaji" placeholder="">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Português *</label>
+        <input type="text" class="form-input" id="cardPortuguese" placeholder="">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline btn" onclick="closeCardModal()">Cancelar</button>
+        <button class="btn" onclick="saveCard()">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Confirmar Exclusão</h2>
+        <p class="modal-description" id="confirmMessage">Tem certeza que deseja excluir este item?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline btn" onclick="closeConfirmModal()">Cancelar</button>
+        <button class="btn btn-danger" onclick="confirmDelete()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span id="toastMessage"></span>
+  </div>
+
+  <script>
+    // Estado da aplicação
+    let appState = {
+      groups: [],
+      decks: [],
+      voiceSettings: {
+        voiceURI: '',
+        rate: 1,
+        pitch: 1
+      },
+      currentView: 'home',
+      currentGroupId: null,
+      currentDeckId: null,
+      currentCardIndex: 0,
+      displayMode: 'kanji',
+      studyCards: [],
+      editingId: null,
+      deleteCallback: null
+    };
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function () {
+      loadData();
+      loadVoices();
+      renderCurrentView();
+    });
+
+    // Gerenciamento de dados
+    function loadData() {
+      try {
+        const stored = localStorage.getItem('japanese-flashcards-data');
+        if (stored) {
+          const data = JSON.parse(stored);
+          appState.groups = data.groups || [];
+          appState.decks = data.decks || [];
+          appState.voiceSettings = data.voiceSettings || { voiceURI: '', rate: 1, pitch: 1 };
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        showToast('Erro ao carregar dados', 'error');
+      }
+    }
+
+    function saveData() {
+      try {
+        const data = {
+          groups: appState.groups,
+          decks: appState.decks,
+          voiceSettings: appState.voiceSettings
+        };
+        localStorage.setItem('japanese-flashcards-data', JSON.stringify(data));
+        updateStorageIndicator();
+      } catch (error) {
+        console.error('Erro ao salvar dados:', error);
+        showToast('Erro ao salvar dados', 'error');
+      }
+    }
+
+    // Funções de armazenamento
+    function getLocalStorageSize() {
+      let total = 0;
+      for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+          total += localStorage[key].length + key.length;
+        }
+      }
+      return total;
+    }
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    function updateStorageIndicator() {
+      try {
+        const usedBytes = getLocalStorageSize();
+        // A maioria dos navegadores tem limite de 5-10MB para localStorage
+        // Vamos usar 5MB como estimativa conservadora
+        const estimatedLimit = 5 * 1024 * 1024; // 5MB em bytes
+        const usedPercentage = (usedBytes / estimatedLimit) * 100;
+
+        const statsElement = document.getElementById('storageStats');
+        const barFillElement = document.getElementById('storageBarFill');
+        const detailsElement = document.getElementById('storageDetails');
+
+        if (statsElement && barFillElement && detailsElement) {
+          statsElement.textContent = `${formatBytes(usedBytes)} / ~${formatBytes(estimatedLimit)}`;
+          barFillElement.style.width = Math.min(usedPercentage, 100) + '%';
+
+          // Remover classes de warning/danger
+          barFillElement.classList.remove('warning', 'danger');
+
+          // Adicionar classe baseada na porcentagem
+          if (usedPercentage >= 100) {
+            barFillElement.classList.add('danger');
+            detailsElement.textContent = '⚠️ Armazenamento cheio!';
+          } else if (usedPercentage >= 90) {
+            barFillElement.classList.add('danger');
+            detailsElement.textContent = '⚠️ Armazenamento quase cheio!';
+          } else if (usedPercentage >= 70) {
+            barFillElement.classList.add('warning');
+            detailsElement.textContent = '⚡ Espaço ficando limitado.';
+          } else {
+            detailsElement.textContent = `${formatBytes(estimatedLimit - usedBytes)} disponíveis.`;
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao atualizar indicador de armazenamento:', error);
+      }
+    }
+
+
+    // Navegação
+    function showView(viewName) {
+      document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+      document.getElementById(viewName + 'View').classList.add('active');
+      appState.currentView = viewName;
+    }
+
+    function navigateToHome() {
+      appState.currentGroupId = null;
+      showView('home');
+      renderGroupsList();
+    }
+
+    function navigateToDecks() {
+      if (!appState.currentGroupId) {
+        navigateToHome();
+        return;
+      }
+      showView('deckList');
+      renderDecksList();
+    }
+
+    function navigateToCardEditor() {
+      if (!appState.currentDeckId) {
+        navigateToDecks();
+        return;
+      }
+      showView('cardEditor');
+      renderCardsList();
+    }
+
+    function navigateToStudy(deckId) {
+      appState.currentDeckId = deckId;
+      const deck = appState.decks.find(d => d.id === deckId);
+      if (!deck || !deck.cards || deck.cards.length === 0) {
+        showToast('Este deck não possui cards', 'error');
+        return;
+      }
+      appState.studyCards = [...deck.cards];
+      appState.currentCardIndex = 0;
+      appState.displayMode = 'kanji';
+      showView('study');
+      updateStudyDisplay();
+    }
+
+    function renderCurrentView() {
+      switch (appState.currentView) {
+        case 'home':
+          renderGroupsList();
+          break;
+        case 'deckList':
+          renderDecksList();
+          break;
+        case 'cardEditor':
+          renderCardsList();
+          break;
+        case 'study':
+          updateStudyDisplay();
+          break;
+      }
+    }
+
+    // Renderização de Grupos
+    function renderGroupsList() {
+      const container = document.getElementById('groupsList');
+
+      if (appState.groups.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="empty-state">
+              <div class="empty-state-icon">📁</div>
+              <p class="empty-state-title">Nenhum grupo criado</p>
+              <p class="empty-state-description">Crie seu primeiro grupo para começar</p>
+            </div>
+          </div>
+        `;
+        updateStorageIndicator();
+        return;
+      }
+
+      container.innerHTML = appState.groups.map(group => `
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">${escapeHtml(group.name)}</h3>
+            <div class="card-actions">
+              <button class="icon-btn" onclick="openEditGroupModal('${group.id}')" title="Editar">✏️</button>
+              <button class="icon-btn" onclick="confirmDeleteGroup('${group.id}')" title="Excluir">🗑️</button>
+            </div>
+          </div>
+          ${group.description ? `<p class="card-description">${escapeHtml(group.description)}</p>` : ''}
+          <button class="btn" onclick="viewGroup('${group.id}')" style="width: 100%;">Ver Decks</button>
+        </div>
+      `).join('');
+
+      updateStorageIndicator();
+    }
+
+    function viewGroup(groupId) {
+      appState.currentGroupId = groupId;
+      showView('deckList');
+      renderDecksList();
+    }
+
+    // Renderização de Decks
+    function renderDecksList() {
+      const group = appState.groups.find(g => g.id === appState.currentGroupId);
+      if (!group) {
+        navigateToHome();
+        return;
+      }
+
+      document.getElementById('groupTitle').textContent = group.name;
+      document.getElementById('groupDescription').textContent = group.description || '';
+
+      const decks = appState.decks.filter(d => d.groupId === appState.currentGroupId);
+      const container = document.getElementById('decksList');
+
+      if (decks.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="empty-state">
+              <div class="empty-state-icon">📚</div>
+              <p class="empty-state-title">Nenhum deck criado</p>
+              <p class="empty-state-description">Crie seu primeiro deck para começar a estudar</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = decks.map(deck => `
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">${escapeHtml(deck.name)}</h3>
+            <div class="card-actions">
+              <button class="icon-btn" onclick="exportDeck('${deck.id}')" title="Exportar">📤</button>
+              <button class="icon-btn" onclick="openEditDeckModal('${deck.id}')" title="Editar">✏️</button>
+              <button class="icon-btn" onclick="confirmDeleteDeck('${deck.id}')" title="Excluir">🗑️</button>
+            </div>
+          </div>
+          ${deck.description ? `<p class="card-description">${escapeHtml(deck.description)}</p>` : ''}
+          <p class="card-description">${deck.cards ? deck.cards.length : 0} ${deck.cards && deck.cards.length === 1 ? 'card' : 'cards'}</p>
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button class="btn" onclick="navigateToStudy('${deck.id}')" style="flex: 1;" ${!deck.cards || deck.cards.length === 0 ? 'disabled' : ''}>
+              Estudar
+            </button>
+            <button class="btn-outline btn" onclick="editDeck('${deck.id}')" style="flex: 1;">
+              Editar Cards
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editDeck(deckId) {
+      appState.currentDeckId = deckId;
+      navigateToCardEditor();
+    }
+
+    // Renderização de Cards
+    function renderCardsList() {
+      const deck = appState.decks.find(d => d.id === appState.currentDeckId);
+      if (!deck) {
+        navigateToDecks();
+        return;
+      }
+
+      document.getElementById('deckTitleEditor').textContent = deck.name;
+
+      const container = document.getElementById('cardsList');
+
+      if (!deck.cards || deck.cards.length === 0) {
+        container.innerHTML = `
+          <div class="card">
+            <div class="empty-state">
+              <div class="empty-state-icon">📝</div>
+              <p class="empty-state-title">Nenhum card criado</p>
+              <p class="empty-state-description">Adicione cards para começar a estudar</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = deck.cards.map((card, index) => `
+        <div class="card-list-item">
+          <div class="card-list-item-header">
+            <h3 class="card-list-item-title">Card ${index + 1}</h3>
+            <div class="card-actions">
+              <button class="icon-btn" onclick="openEditCardModal('${card.id}')" title="Editar">✏️</button>
+              <button class="icon-btn" onclick="confirmDeleteCard('${card.id}')" title="Excluir">🗑️</button>
+            </div>
+          </div>
+          <div class="card-list-item-content">
+            <div class="card-field">
+              <div class="card-field-label">Kanji</div>
+              <div class="card-field-value">${escapeHtml(card.kanji)}</div>
+            </div>
+            <div class="card-field">
+              <div class="card-field-label">Hiragana/Katakana</div>
+              <div class="card-field-value">${escapeHtml(card.hiragana)}</div>
+            </div>
+            ${card.romaji ? `
+              <div class="card-field">
+                <div class="card-field-label">Rômaji</div>
+                <div class="card-field-value">${escapeHtml(card.romaji)}</div>
+              </div>
+            ` : ''}
+            <div class="card-field">
+              <div class="card-field-label">Português</div>
+              <div class="card-field-value">${escapeHtml(card.portuguese)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Estudo
+    function updateStudyDisplay() {
+      if (!appState.studyCards || appState.studyCards.length === 0) {
+        document.getElementById('flashcardText').textContent = 'Nenhum card disponível';
+        return;
+      }
+
+      const card = appState.studyCards[appState.currentCardIndex];
+      const total = appState.studyCards.length;
+      const current = appState.currentCardIndex + 1;
+      const progress = Math.round((current / total) * 100);
+
+      // Atualizar texto do card
+      let text = '';
+      switch (appState.displayMode) {
+        case 'kanji':
+          text = card.kanji;
+          break;
+        case 'hiragana':
+          text = card.hiragana;
+          break;
+        case 'romaji':
+          text = card.romaji || card.hiragana;
+          break;
+        case 'portuguese':
+          text = card.portuguese;
+          break;
+      }
+      document.getElementById('flashcardText').textContent = text;
+
+      // Atualizar progresso
+      document.getElementById('progressText').textContent = `Card ${current} de ${total} ${progress}%`;
+      document.getElementById('progressFill').style.width = `${progress}%`;
+
+      // Atualizar botões de modo
+      document.querySelectorAll('.button-group .btn').forEach(btn => {
+        btn.classList.remove('btn');
+        btn.classList.add('btn-outline', 'btn');
+      });
+      const activeBtn = document.getElementById('btn' + appState.displayMode.charAt(0).toUpperCase() + appState.displayMode.slice(1));
+      if (activeBtn) {
+        activeBtn.classList.remove('btn-outline');
+        activeBtn.classList.add('btn');
+      }
+
+      // Atualizar botões de navegação
+      document.getElementById('btnPrevious').disabled = appState.currentCardIndex === 0;
+      document.getElementById('btnNext').disabled = appState.currentCardIndex === total - 1;
+    }
+
+    function setDisplayMode(mode) {
+      appState.displayMode = mode;
+      updateStudyDisplay();
+    }
+
+    function previousCard() {
+      if (appState.currentCardIndex > 0) {
+        appState.currentCardIndex--;
+        updateStudyDisplay();
+      }
+    }
+
+    function nextCard() {
+      if (appState.currentCardIndex < appState.studyCards.length - 1) {
+        appState.currentCardIndex++;
+        updateStudyDisplay();
+      }
+    }
+
+    function shuffleCards() {
+      appState.studyCards = appState.studyCards.sort(() => Math.random() - 0.5);
+      appState.currentCardIndex = 0;
+      updateStudyDisplay();
+      showToast('Cards embaralhados', 'success');
+    }
+
+    function restartStudy() {
+      const deck = appState.decks.find(d => d.id === appState.currentDeckId);
+      if (deck) {
+        appState.studyCards = [...deck.cards];
+        appState.currentCardIndex = 0;
+        updateStudyDisplay();
+        showToast('Reiniciado', 'success');
+      }
+    }
+
+    // TTS
+    function loadVoices() {
+      const select = document.getElementById('voiceSelect');
+      const voices = window.speechSynthesis.getVoices();
+      const japaneseVoices = voices.filter(v => v.lang.startsWith('ja'));
+
+      select.innerHTML = japaneseVoices.map(voice =>
+        `<option value="${voice.voiceURI}">${voice.name} (${voice.lang})</option>`
+      ).join('');
+
+      if (japaneseVoices.length > 0 && !appState.voiceSettings.voiceURI) {
+        const defaultVoice = japaneseVoices.find(v => v.name.includes('Haruka')) || japaneseVoices[0];
+        appState.voiceSettings.voiceURI = defaultVoice.voiceURI;
+        select.value = defaultVoice.voiceURI;
+      } else if (appState.voiceSettings.voiceURI) {
+        select.value = appState.voiceSettings.voiceURI;
+      }
+
+      document.getElementById('rateSlider').value = appState.voiceSettings.rate;
+      document.getElementById('rateValue').textContent = appState.voiceSettings.rate + 'x';
+      document.getElementById('pitchSlider').value = appState.voiceSettings.pitch;
+      document.getElementById('pitchValue').textContent = appState.voiceSettings.pitch;
+    }
+
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speakCard() {
+      if (!appState.studyCards || appState.studyCards.length === 0) return;
+
+      const card = appState.studyCards[appState.currentCardIndex];
+      const text = card.hiragana;
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const selectedVoice = voices.find(v => v.voiceURI === appState.voiceSettings.voiceURI);
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
+      utterance.rate = appState.voiceSettings.rate;
+      utterance.pitch = appState.voiceSettings.pitch;
+      utterance.lang = 'ja-JP';
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function updateVoiceSettings() {
+      appState.voiceSettings.voiceURI = document.getElementById('voiceSelect').value;
+      saveData();
+    }
+
+    function updateRate(value) {
+      appState.voiceSettings.rate = parseFloat(value);
+      document.getElementById('rateValue').textContent = value + 'x';
+      saveData();
+    }
+
+    function updatePitch(value) {
+      appState.voiceSettings.pitch = parseFloat(value);
+      document.getElementById('pitchValue').textContent = value;
+      saveData();
+    }
+
+    function toggleVoiceSettings() {
+      const content = document.getElementById('voiceSettingsContent');
+      content.classList.toggle('active');
+    }
+
+    // Modais - Grupo
+    function openCreateGroupModal() {
+      appState.editingId = null;
+      document.getElementById('groupModalTitle').textContent = 'Criar Novo Grupo';
+      document.getElementById('groupName').value = '';
+      document.getElementById('groupDescription').value = '';
+      document.getElementById('groupModal').classList.add('active');
+    }
+
+    function openEditGroupModal(groupId) {
+      const group = appState.groups.find(g => g.id === groupId);
+      if (!group) return;
+
+      appState.editingId = groupId;
+      document.getElementById('groupModalTitle').textContent = 'Editar Grupo';
+      document.getElementById('groupName').value = group.name;
+      document.getElementById('groupDescription').value = group.description || '';
+      document.getElementById('groupModal').classList.add('active');
+    }
+
+    function closeGroupModal() {
+      document.getElementById('groupModal').classList.remove('active');
+      appState.editingId = null;
+    }
+
+    function saveGroup() {
+      const name = document.getElementById('groupName').value.trim();
+      const description = document.getElementById('groupDescription').value.trim();
+
+      if (!name) {
+        showToast('O nome do grupo é obrigatório', 'error');
+        return;
+      }
+
+      if (appState.editingId) {
+        // Editar
+        const group = appState.groups.find(g => g.id === appState.editingId);
+        if (group) {
+          group.name = name;
+          group.description = description;
+          group.updatedAt = new Date().toISOString();
+          showToast('Grupo atualizado com sucesso', 'success');
+        }
+      } else {
+        // Criar
+        const newGroup = {
+          id: generateId(),
+          name,
+          description,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        appState.groups.push(newGroup);
+        showToast('Grupo criado com sucesso', 'success');
+      }
+
+      saveData();
+      closeGroupModal();
+      renderGroupsList();
+    }
+
+    function confirmDeleteGroup(groupId) {
+      appState.deleteCallback = () => {
+        appState.groups = appState.groups.filter(g => g.id !== groupId);
+        appState.decks = appState.decks.filter(d => d.groupId !== groupId);
+        saveData();
+        renderGroupsList();
+        showToast('Grupo excluído com sucesso', 'success');
+      };
+      document.getElementById('confirmMessage').textContent =
+        'Tem certeza que deseja excluir este grupo? Todos os decks e cards associados serão removidos. Esta ação não pode ser desfeita.';
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    // Modais - Deck
+    function openCreateDeckModal() {
+      appState.editingId = null;
+      document.getElementById('deckModalTitle').textContent = 'Criar Novo Deck';
+      document.getElementById('deckName').value = '';
+      document.getElementById('deckDescription').value = '';
+      document.getElementById('deckModal').classList.add('active');
+    }
+
+    function openEditDeckModal(deckId) {
+      const deck = appState.decks.find(d => d.id === deckId);
+      if (!deck) return;
+
+      appState.editingId = deckId;
+      document.getElementById('deckModalTitle').textContent = 'Editar Deck';
+      document.getElementById('deckName').value = deck.name;
+      document.getElementById('deckDescription').value = deck.description || '';
+      document.getElementById('deckModal').classList.add('active');
+    }
+
+    function closeDeckModal() {
+      document.getElementById('deckModal').classList.remove('active');
+      appState.editingId = null;
+    }
+
+    function saveDeck() {
+      const name = document.getElementById('deckName').value.trim();
+      const description = document.getElementById('deckDescription').value.trim();
+
+      if (!name) {
+        showToast('O nome do deck é obrigatório', 'error');
+        return;
+      }
+
+      if (appState.editingId) {
+        // Editar
+        const deck = appState.decks.find(d => d.id === appState.editingId);
+        if (deck) {
+          deck.name = name;
+          deck.description = description;
+          deck.updatedAt = new Date().toISOString();
+          showToast('Deck atualizado com sucesso', 'success');
+        }
+      } else {
+        // Criar
+        const newDeck = {
+          id: generateId(),
+          name,
+          description,
+          groupId: appState.currentGroupId,
+          cards: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        appState.decks.push(newDeck);
+        showToast('Deck criado com sucesso', 'success');
+      }
+
+      saveData();
+      closeDeckModal();
+      renderDecksList();
+    }
+
+    function confirmDeleteDeck(deckId) {
+      appState.deleteCallback = () => {
+        appState.decks = appState.decks.filter(d => d.id !== deckId);
+        saveData();
+        renderDecksList();
+        showToast('Deck excluído com sucesso', 'success');
+      };
+      document.getElementById('confirmMessage').textContent =
+        'Tem certeza que deseja excluir este deck? Todos os cards associados serão removidos. Esta ação não pode ser desfeita.';
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    // Modais - Card
+    function openCreateCardModal() {
+      appState.editingId = null;
+      document.getElementById('cardModalTitle').textContent = 'Criar Novo Card';
+      document.getElementById('cardKanji').value = '';
+      document.getElementById('cardHiragana').value = '';
+      document.getElementById('cardRomaji').value = '';
+      document.getElementById('cardPortuguese').value = '';
+      document.getElementById('cardModal').classList.add('active');
+    }
+
+    function openEditCardModal(cardId) {
+      const deck = appState.decks.find(d => d.id === appState.currentDeckId);
+      if (!deck) return;
+
+      const card = deck.cards.find(c => c.id === cardId);
+      if (!card) return;
+
+      appState.editingId = cardId;
+      document.getElementById('cardModalTitle').textContent = 'Editar Card';
+      document.getElementById('cardKanji').value = card.kanji;
+      document.getElementById('cardHiragana').value = card.hiragana;
+      document.getElementById('cardRomaji').value = card.romaji || '';
+      document.getElementById('cardPortuguese').value = card.portuguese;
+      document.getElementById('cardModal').classList.add('active');
+    }
+
+    function closeCardModal() {
+      document.getElementById('cardModal').classList.remove('active');
+      appState.editingId = null;
+    }
+
+    function saveCard() {
+      const kanji = document.getElementById('cardKanji').value.trim();
+      const hiragana = document.getElementById('cardHiragana').value.trim();
+      const romaji = document.getElementById('cardRomaji').value.trim();
+      const portuguese = document.getElementById('cardPortuguese').value.trim();
+
+      if (!kanji || !hiragana || !portuguese) {
+        showToast('Os campos Kanji, Hiragana e Português são obrigatórios', 'error');
+        return;
+      }
+
+      const deck = appState.decks.find(d => d.id === appState.currentDeckId);
+      if (!deck) return;
+
+      if (appState.editingId) {
+        // Editar
+        const card = deck.cards.find(c => c.id === appState.editingId);
+        if (card) {
+          card.kanji = kanji;
+          card.hiragana = hiragana;
+          card.romaji = romaji;
+          card.portuguese = portuguese;
+          showToast('Card atualizado com sucesso', 'success');
+        }
+      } else {
+        // Criar
+        const newCard = {
+          id: generateId(),
+          kanji,
+          hiragana,
+          romaji,
+          portuguese
+        };
+        deck.cards.push(newCard);
+        showToast('Card criado com sucesso', 'success');
+      }
+
+      deck.updatedAt = new Date().toISOString();
+      saveData();
+      closeCardModal();
+      renderCardsList();
+    }
+
+    function confirmDeleteCard(cardId) {
+      appState.deleteCallback = () => {
+        const deck = appState.decks.find(d => d.id === appState.currentDeckId);
+        if (deck) {
+          deck.cards = deck.cards.filter(c => c.id !== cardId);
+          deck.updatedAt = new Date().toISOString();
+          saveData();
+          renderCardsList();
+          showToast('Card excluído com sucesso', 'success');
+        }
+      };
+      document.getElementById('confirmMessage').textContent =
+        'Tem certeza que deseja excluir este card? Esta ação não pode ser desfeita.';
+      document.getElementById('confirmModal').classList.add('active');
+    }
+
+    // Modal de Confirmação
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('active');
+      appState.deleteCallback = null;
+    }
+
+    function confirmDelete() {
+      if (appState.deleteCallback) {
+        appState.deleteCallback();
+      }
+      closeConfirmModal();
+    }
+
+    // Import/Export
+    function exportAllData() {
+      try {
+        const data = {
+          groups: appState.groups,
+          decks: appState.decks,
+          voiceSettings: appState.voiceSettings
+        };
+        const json = JSON.stringify(data, null, 2);
+        downloadFile(json, `flashcards-backup-${getDateString()}.json`, 'application/json');
+        showToast('Dados exportados com sucesso', 'success');
+      } catch (error) {
+        showToast('Erro ao exportar dados', 'error');
+      }
+    }
+
+    function exportDeck(deckId) {
+      try {
+        const deck = appState.decks.find(d => d.id === deckId);
+        if (!deck) {
+          showToast('Deck não encontrado', 'error');
+          return;
+        }
+        const json = JSON.stringify(deck, null, 2);
+        downloadFile(json, `deck-${deck.name.replace(/\s+/g, '-')}-${getDateString()}.json`, 'application/json');
+        showToast('Deck exportado com sucesso', 'success');
+      } catch (error) {
+        showToast('Erro ao exportar deck', 'error');
+      }
+    }
+
+    function importData() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            if (!data.groups || !data.decks) {
+              showToast('Formato de dados inválido', 'error');
+              return;
+            }
+            appState.groups = data.groups;
+            appState.decks = data.decks;
+            appState.voiceSettings = data.voiceSettings || { voiceURI: '', rate: 1, pitch: 1 };
+            saveData();
+            renderGroupsList();
+            showToast('Dados importados com sucesso', 'success');
+          } catch (error) {
+            showToast('Erro ao importar dados', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function importDeck() {
+      if (!appState.currentGroupId) {
+        showToast('Erro: Nenhum grupo selecionado', 'error');
+        return;
+      }
+
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const deckData = JSON.parse(event.target.result);
+
+            if (!deckData.name || !deckData.cards) {
+              showToast('Formato de deck inválido', 'error');
+              return;
+            }
+
+            const newDeck = {
+              id: generateId(),
+              name: deckData.name,
+              description: deckData.description || '',
+              groupId: appState.currentGroupId,
+              cards: deckData.cards.map(card => ({
+                id: generateId(),
+                kanji: card.kanji,
+                hiragana: card.hiragana,
+                romaji: card.romaji || '',
+                portuguese: card.portuguese
+              })),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+
+            appState.decks.push(newDeck);
+            saveData();
+            renderDecksList();
+            showToast(`Deck "${newDeck.name}" importado com ${newDeck.cards.length} cards`, 'success');
+          } catch (error) {
+            showToast('Erro ao importar deck. Verifique o formato do arquivo.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    // Utilitários
+    function generateId() {
+      return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    }
+
+    function getDateString() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+
+      toastMessage.textContent = message;
+      toast.className = `toast ${type} active`;
+
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+
+    // Fechar modais ao clicar fora
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
