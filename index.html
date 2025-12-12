@@ -42,6 +42,11 @@
       color: #7f8c8d;
     }
 
+    .header .subtitle {
+      font-size: 0.875rem;
+      color: #7f8c8d;
+    }
+
     .btn {
       background-color: #4A90E2;
       color: white;
@@ -669,7 +674,7 @@
 
       <div class="header">
         <h1 id="groupTitle"></h1>
-        <p id="groupDescriptionDisplay" class="version"></p>
+        <p id="groupDescriptionDisplay" class="subtitle"></p>
       </div>
 
       <div class="toolbar">
@@ -704,7 +709,7 @@
 
       <div class="header">
         <h1 id="deckTitleEditor"></h1>
-        <p class="version">Editar Cards</p>
+        <p class="subtitle">Editar Cards</p>
       </div>
 
       <div class="toolbar">
@@ -907,6 +912,12 @@
   </div>
 
   <script>
+    let version = '1.0.2';
+    // atualiza o texto dos elementos que possui as class header e version
+    document.querySelectorAll('.header .version').forEach(element => {
+      element.textContent = 'versão ' + version;
+    });
+
     // Estado da aplicação
     let appState = {
       groups: [],
@@ -1725,6 +1736,52 @@
               return;
             }
 
+            // Check if a group with the same name already exists
+            const existingGroup = appState.groups.find(g => g.name === data.group.name);
+
+            if (existingGroup) {
+              // Ask user if they want to replace the existing group
+              if (!confirm(`Já existe um grupo chamado "${data.group.name}".\n\nDeseja substituir o grupo existente?\n\n• SIM: Substituir completamente o grupo atual\n• NÃO: Cancelar importação`)) {
+                showToast('Importação cancelada', 'error');
+                return;
+              }
+
+              // Replace existing group
+              // Remove all decks from the old group
+              appState.decks = appState.decks.filter(d => d.groupId !== existingGroup.id);
+
+              // Update existing group data
+              existingGroup.description = data.group.description || '';
+              existingGroup.updatedAt = new Date().toISOString();
+
+              // Import all decks to the existing group
+              let totalCards = 0;
+              data.decks.forEach(deckData => {
+                const newDeck = {
+                  id: generateId(),
+                  name: deckData.name,
+                  description: deckData.description || '',
+                  groupId: existingGroup.id,
+                  cards: deckData.cards.map(card => ({
+                    id: generateId(),
+                    kanji: card.kanji,
+                    hiragana: card.hiragana,
+                    romaji: card.romaji || '',
+                    portuguese: card.portuguese
+                  })),
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString()
+                };
+                totalCards += newDeck.cards.length;
+                appState.decks.push(newDeck);
+              });
+
+              saveData();
+              renderGroupsList();
+              showToast(`Grupo "${existingGroup.name}" substituído com ${data.decks.length} deck(s) e ${totalCards} card(s)`, 'success');
+              return;
+            }
+
             // Create new group with new ID
             const newGroup = {
               id: generateId(),
@@ -1824,6 +1881,36 @@
               return;
             }
 
+            // Check if a deck with the same name already exists in the current group
+            const existingDeck = appState.decks.find(d =>
+              d.name === deckData.name && d.groupId === appState.currentGroupId
+            );
+
+            if (existingDeck) {
+              // Ask user if they want to replace the existing deck
+              if (!confirm(`Já existe um deck chamado "${deckData.name}" neste grupo.\n\nDeseja substituir o deck existente?\n\n• SIM: Substituir completamente o deck atual\n• NÃO: Cancelar importação`)) {
+                showToast('Importação cancelada', 'error');
+                return;
+              }
+
+              // Replace existing deck
+              existingDeck.description = deckData.description || '';
+              existingDeck.cards = deckData.cards.map(card => ({
+                id: generateId(),
+                kanji: card.kanji,
+                hiragana: card.hiragana,
+                romaji: card.romaji || '',
+                portuguese: card.portuguese
+              }));
+              existingDeck.updatedAt = new Date().toISOString();
+
+              saveData();
+              renderDecksList();
+              showToast(`Deck "${existingDeck.name}" substituído com ${existingDeck.cards.length} cards`, 'success');
+              return;
+            }
+
+            // Create new deck
             const newDeck = {
               id: generateId(),
               name: deckData.name,
