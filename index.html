@@ -694,7 +694,7 @@
     <div id="homeView" class="view active">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.1</p>
+        <p class="version">versão 1.0.0</p>
       </div>
 
       <div class="toolbar">
@@ -737,7 +737,7 @@
     <div id="deckListView" class="view">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.1</p>
+        <p class="version">versão 1.0.0</p>
       </div>
 
       <!--
@@ -772,7 +772,7 @@
     <div id="cardEditorView" class="view">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.1</p>
+        <p class="version">versão 1.0.0</p>
       </div>
 
       <!--
@@ -804,7 +804,7 @@
     <div id="studyView" class="view">
       <div class="header">
         <h1>日本語 Flashcards</h1>
-        <p class="version">versão 1.0.1</p>
+        <p class="version">versão 1.0.0</p>
       </div>
 
       <div class="progress-text" id="progressText">Card 1 de 0 0%</div>
@@ -816,9 +816,11 @@
         <button class="btn-outline btn" onclick="navigateToDecks()">
           ← Voltar Decks
         </button>
+        <!--
         <button class="btn-outline btn" onclick="navigateToCardEditor()">
           ✏️ Editar Deck
         </button>
+        -->
         <button class="btn-outline btn" onclick="shuffleCards()">
           🔀 Misturar
         </button>
@@ -950,7 +952,7 @@
         <input type="text" class="form-input" id="cardKanji" placeholder="">
       </div>
       <div class="form-group">
-        <label class="form-label">Hiragana / Katakana *</label>
+        <label class="form-label">Hiragana / Katakana: Voz *</label>
         <input type="text" class="form-input" id="cardHiragana" placeholder="">
       </div>
       <div class="form-group">
@@ -994,7 +996,7 @@
   </div>
 
   <script>
-    let version = '1.0.31';
+    let version = '1.0.33';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
@@ -1195,7 +1197,9 @@
         return;
       }
 
-      container.innerHTML = appState.groups.map(group => `
+      const sortedGroups = [...appState.groups].sort((a, b) => a.name.localeCompare(b.name));
+
+      container.innerHTML = sortedGroups.map(group => `
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">${escapeHtml(group.name)}</h3>
@@ -1230,7 +1234,9 @@
       document.getElementById('groupTitle').textContent = group.name;
       document.getElementById('groupDescriptionDisplay').textContent = group.description || '';
 
-      const decks = appState.decks.filter(d => d.groupId === appState.currentGroupId);
+      const decks = appState.decks
+        .filter(d => d.groupId === appState.currentGroupId)
+        .sort((a, b) => a.name.localeCompare(b.name));
       const container = document.getElementById('decksList');
 
       if (decks.length === 0) {
@@ -1392,6 +1398,7 @@
       if (appState.currentCardIndex > 0) {
         appState.currentCardIndex--;
         updateStudyDisplay();
+        setDisplayMode('kanji');
       }
     }
 
@@ -1399,6 +1406,7 @@
       if (appState.currentCardIndex < appState.studyCards.length - 1) {
         appState.currentCardIndex++;
         updateStudyDisplay();
+        setDisplayMode('kanji');
       }
     }
 
@@ -1406,6 +1414,7 @@
       appState.studyCards = appState.studyCards.sort(() => Math.random() - 0.5);
       appState.currentCardIndex = 0;
       updateStudyDisplay();
+      setDisplayMode('kanji');
       showToast('Cards embaralhados', 'success');
     }
 
@@ -1415,6 +1424,7 @@
         appState.studyCards = [...deck.cards];
         appState.currentCardIndex = 0;
         updateStudyDisplay();
+        setDisplayMode('kanji');
         showToast('Reiniciado', 'success');
       }
     }
