@@ -612,6 +612,10 @@
       color: #95a5a6;
       text-align: right;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
   <script>
     let newWorker;
@@ -702,22 +706,25 @@
           <button class="btn" onclick="openCreateGroupModal()">
             ➕ Novo Grupo
           </button>
+        </div>
+        <div class="toolbar-right">
           <button class="btn-outline btn" onclick="importGroup()">
             📥 Importar
           </button>
-        </div>
-        <div class="toolbar-right">
           <button class="btn-outline btn" onclick="importData()">
             📥 Importar Tudo
           </button>
           <button class="btn-outline btn" onclick="exportAllData()">
             📤 Exportar Tudo
           </button>
+          <button class="btn-outline btn" onclick="showHideStorageIndicator()">
+            📤 Armazenamento
+          </button>
         </div>
       </div>
 
       <!-- Storage Indicator -->
-      <div class="storage-indicator">
+      <div class="storage-indicator hidden" id="storageIndicator">
         <div class="storage-header">
           <span class="storage-title">💾 Armazenamento</span>
           <span class="storage-stats" id="storageStats">Calculando...</span>
@@ -754,15 +761,19 @@
       </div>
 
       <div class="toolbar">
-        <button class="btn" onclick="openCreateDeckModal()">
-          ➕ Novo Deck
-        </button>
-        <button class="btn-outline btn" onclick="importDeck()">
-          📥 Importar Deck
-        </button>
-        <button class="btn-outline btn" onclick="navigateToHome()">
-          ← Voltar Grupos
-        </button>
+        <div class="toolbar-left">
+          <button class="btn" onclick="openCreateDeckModal()">
+            ➕ Novo Deck
+          </button>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn-outline btn" onclick="importDeck()">
+            📥 Importar Deck
+          </button>
+          <button class="btn-outline btn" onclick="navigateToHome()">
+            ← Voltar Grupos
+          </button>
+        </div>
       </div>
 
       <div id="decksList" class="grid"></div>
@@ -813,9 +824,6 @@
       </div>
 
       <div class="button-group">
-        <button class="btn-outline btn" onclick="navigateToDecks()">
-          ← Voltar Decks
-        </button>
         <!--
         <button class="btn-outline btn" onclick="navigateToCardEditor()">
           ✏️ Editar Deck
@@ -826,6 +834,9 @@
         </button>
         <button class="btn-outline btn" onclick="restartStudy()">
           🔄 Reiniciar
+        </button>
+        <button class="btn-outline btn" onclick="navigateToDecks()">
+          ← Voltar Decks
         </button>
       </div>
 
@@ -996,7 +1007,7 @@
   </div>
 
   <script>
-    let version = '1.0.33';
+    let version = '1.0.34';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
@@ -1108,7 +1119,7 @@
             barFillElement.classList.add('warning');
             detailsElement.textContent = '⚡ Espaço ficando limitado.';
           } else {
-            detailsElement.textContent = `${formatBytes(estimatedLimit - usedBytes)} disponíveis.`;
+            detailsElement.textContent = `${usedPercentage.toFixed(2)}% de ${formatBytes(estimatedLimit - usedBytes)} disponíveis.`;
           }
         }
       } catch (error) {
@@ -2067,6 +2078,11 @@
       setTimeout(() => {
         toast.classList.remove('active');
       }, 3000);
+    }
+
+    function showHideStorageIndicator() {
+      const box = document.getElementById("storageIndicator");
+      box.classList.toggle("hidden");
     }
 
     // Fechar modais ao clicar fora
