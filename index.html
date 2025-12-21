@@ -995,6 +995,28 @@
     </div>
   </div>
 
+  <!-- Import Confirmation Modal -->
+  <div id="importConfirmationModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Atenção!</h2>
+        <p class="modal-description">A importação de dados substituirá TODOS os grupos e decks existentes.</p>
+      </div>
+      <div class="modal-body" style="margin-bottom: 24px;">
+        <p style="color: #e74c3c; font-weight: bold; margin-bottom: 12px;">
+          Esta ação não pode ser desfeita. Todos os seus dados atuais serão perdidos.
+        </p>
+        <p style="color: #7f8c8d; font-size: 0.95rem;">
+          Recomendamos que você exporte seus dados atuais antes de prosseguir, caso queira mantê-los.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline btn" onclick="closeImportConfirmationModal()">Cancelar</button>
+        <button class="btn btn-danger" onclick="proceedWithImportData()">Continuar e Substituir</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast">
     <span id="toastMessage"></span>
@@ -1007,7 +1029,7 @@
   </div>
 
   <script>
-    let version = '1.0.34';
+    let version = '1.0.35';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
@@ -1931,6 +1953,15 @@
     }
 
     function importData() {
+      document.getElementById('importConfirmationModal').classList.add('active');
+    }
+
+    function closeImportConfirmationModal() {
+      document.getElementById('importConfirmationModal').classList.remove('active');
+    }
+
+    function proceedWithImportData() {
+      closeImportConfirmationModal();
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'application/json';
