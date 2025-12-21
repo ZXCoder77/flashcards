@@ -1017,6 +1017,20 @@
     </div>
   </div>
 
+  <!-- Generic Conflict Modal -->
+  <div id="conflictModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="conflictModalTitle">Conflito Detectado</h2>
+        <div class="modal-description" id="conflictModalMessage"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-outline btn" onclick="closeConflictModal()">Cancelar</button>
+        <button class="btn btn-danger" onclick="handleConflictConfirm()">Substituir</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast">
     <span id="toastMessage"></span>
@@ -1029,7 +1043,7 @@
   </div>
 
   <script>
-    let version = '1.0.35';
+    let version = '1.0.36';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
@@ -1788,6 +1802,28 @@
       closeConfirmModal();
     }
 
+    // Generic Conflict Modal
+    let conflictCallback = null;
+
+    function showConflictModal(title, message, onConfirm) {
+      document.getElementById('conflictModalTitle').textContent = title;
+      document.getElementById('conflictModalMessage').innerHTML = message; // Use innerHTML for formatted text
+      conflictCallback = onConfirm;
+      document.getElementById('conflictModal').classList.add('active');
+    }
+
+    function closeConflictModal() {
+      document.getElementById('conflictModal').classList.remove('active');
+      conflictCallback = null;
+    }
+
+    function handleConflictConfirm() {
+      if (conflictCallback) {
+        conflictCallback();
+      }
+      closeConflictModal();
+    }
+
     // Import/Export
     function exportAllData() {
       try {
@@ -1866,44 +1902,45 @@
 
             if (existingGroup) {
               // Ask user if they want to replace the existing group
-              if (!confirm(`Já existe um grupo chamado "${data.group.name}".\n\nDeseja substituir o grupo existente?\n\n• SIM: Substituir completamente o grupo atual\n• NÃO: Cancelar importação`)) {
-                showToast('Importação cancelada', 'error');
-                return;
-              }
+              showConflictModal(
+                'Grupo Já Existente',
+                `Já existe um grupo chamado "<strong>${escapeHtml(data.group.name)}</strong>".<br><br>Deseja substituir o grupo existente?<br><br>Isso substituirá todos os decks e cards deste grupo.`,
+                () => {
+                  // Replace existing group
+                  // Remove all decks from the old group
+                  appState.decks = appState.decks.filter(d => d.groupId !== existingGroup.id);
 
-              // Replace existing group
-              // Remove all decks from the old group
-              appState.decks = appState.decks.filter(d => d.groupId !== existingGroup.id);
+                  // Update existing group data
+                  existingGroup.description = data.group.description || '';
+                  existingGroup.updatedAt = new Date().toISOString();
 
-              // Update existing group data
-              existingGroup.description = data.group.description || '';
-              existingGroup.updatedAt = new Date().toISOString();
+                  // Import all decks to the existing group
+                  let totalCards = 0;
+                  data.decks.forEach(deckData => {
+                    const newDeck = {
+                      id: generateId(),
+                      name: deckData.name,
+                      description: deckData.description || '',
+                      groupId: existingGroup.id,
+                      cards: deckData.cards.map(card => ({
+                        id: generateId(),
+                        kanji: card.kanji,
+                        hiragana: card.hiragana,
+                        romaji: card.romaji || '',
+                        portuguese: card.portuguese
+                      })),
+                      createdAt: new Date().toISOString(),
+                      updatedAt: new Date().toISOString()
+                    };
+                    totalCards += newDeck.cards.length;
+                    appState.decks.push(newDeck);
+                  });
 
-              // Import all decks to the existing group
-              let totalCards = 0;
-              data.decks.forEach(deckData => {
-                const newDeck = {
-                  id: generateId(),
-                  name: deckData.name,
-                  description: deckData.description || '',
-                  groupId: existingGroup.id,
-                  cards: deckData.cards.map(card => ({
-                    id: generateId(),
-                    kanji: card.kanji,
-                    hiragana: card.hiragana,
-                    romaji: card.romaji || '',
-                    portuguese: card.portuguese
-                  })),
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString()
-                };
-                totalCards += newDeck.cards.length;
-                appState.decks.push(newDeck);
-              });
-
-              saveData();
-              renderGroupsList();
-              showToast(`Grupo "${existingGroup.name}" substituído com ${data.decks.length} deck(s) e ${totalCards} card(s)`, 'success');
+                  saveData();
+                  renderGroupsList();
+                  showToast(`Grupo "${existingGroup.name}" substituído com ${data.decks.length} deck(s) e ${totalCards} card(s)`, 'success');
+                }
+              );
               return;
             }
 
@@ -2022,25 +2059,26 @@
 
             if (existingDeck) {
               // Ask user if they want to replace the existing deck
-              if (!confirm(`Já existe um deck chamado "${deckData.name}" neste grupo.\n\nDeseja substituir o deck existente?\n\n• SIM: Substituir completamente o deck atual\n• NÃO: Cancelar importação`)) {
-                showToast('Importação cancelada', 'error');
-                return;
-              }
+              showConflictModal(
+                'Deck Já Existente',
+                `Já existe um deck chamado "<strong>${escapeHtml(deckData.name)}</strong>" neste grupo.<br><br>Deseja substituir o deck existente?<br><br>Isso substituirá todos os cards deste deck.`,
+                () => {
+                  // Replace existing deck
+                  existingDeck.description = deckData.description || '';
+                  existingDeck.cards = deckData.cards.map(card => ({
+                    id: generateId(),
+                    kanji: card.kanji,
+                    hiragana: card.hiragana,
+                    romaji: card.romaji || '',
+                    portuguese: card.portuguese
+                  }));
+                  existingDeck.updatedAt = new Date().toISOString();
 
-              // Replace existing deck
-              existingDeck.description = deckData.description || '';
-              existingDeck.cards = deckData.cards.map(card => ({
-                id: generateId(),
-                kanji: card.kanji,
-                hiragana: card.hiragana,
-                romaji: card.romaji || '',
-                portuguese: card.portuguese
-              }));
-              existingDeck.updatedAt = new Date().toISOString();
-
-              saveData();
-              renderDecksList();
-              showToast(`Deck "${existingDeck.name}" substituído com ${existingDeck.cards.length} cards`, 'success');
+                  saveData();
+                  renderDecksList();
+                  showToast(`Deck "${existingDeck.name}" substituído com ${existingDeck.cards.length} cards`, 'success');
+                }
+              );
               return;
             }
 
