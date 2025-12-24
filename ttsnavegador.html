@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to Speech (Android)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 1.1em;
+      padding: 8px;
+    }
+    button {
+      font-size: 1em;
+      margin-top: 10px;
+      padding: 10px 20px;
+    }
+    select {
+      width: 100%;
+      margin-top: 10px;
+      padding: 6px;
+    }
+    .controle {
+      margin-top: 10px;
+      text-align: left;
+    }
+    .controle label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .controle input[type="range"] {
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    .valor-controle {
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔊 Texto para Fala (Web Speech API)</h1>
+  <textarea id="texto" placeholder="Digite algo para o Android falar..."></textarea>
+  <select id="voz"></select><br>
+  
+  <div class="controle">
+    <label for="velocidade">Velocidade da Fala:</label>
+    <input type="range" id="velocidade" min="0.1" max="2" step="0.1" value="1">
+    <div class="valor-controle">Velocidade: <span id="valorVelocidade">1.0</span>x</div>
+  </div>
+  
+  <button id="falar">Falar</button>
+
+  <script>
+    const synth = window.speechSynthesis;
+    const vozSelect = document.getElementById('voz');
+    const falarBtn = document.getElementById('falar');
+    const textoInput = document.getElementById('texto');
+    const velocidadeSlider = document.getElementById('velocidade');
+    const valorVelocidade = document.getElementById('valorVelocidade');
+
+    // Carregar vozes disponíveis
+    function carregarVozes() {
+      const vozes = synth.getVoices();
+      vozSelect.innerHTML = '';
+      vozes.forEach(voz => {
+        const option = document.createElement('option');
+        option.value = voz.name;
+        option.textContent = `${voz.name} (${voz.lang})`;
+        vozSelect.appendChild(option);
+      });
+    }
+
+    synth.onvoiceschanged = carregarVozes;
+
+    // Atualizar exibição da velocidade
+    velocidadeSlider.addEventListener('input', function() {
+      valorVelocidade.textContent = this.value;
+    });
+
+    // Função para falar
+    function falar() {
+      const texto = textoInput.value.trim();
+      if (!texto) return;
+
+      const fala = new SpeechSynthesisUtterance(texto);
+      const vozSelecionada = vozSelect.value;
+      const vozes = synth.getVoices();
+      fala.voice = vozes.find(v => v.name === vozSelecionada);
+      fala.lang = fala.voice?.lang || 'pt-BR';
+      fala.rate = parseFloat(velocidadeSlider.value); // Definir velocidade
+      synth.speak(fala);
+    }
+
+    falarBtn.addEventListener('click', falar);
+  </script>
+</body>
+</html>
