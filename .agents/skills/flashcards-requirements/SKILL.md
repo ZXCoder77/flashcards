@@ -1,9 +1,14 @@
+---
+name: flashcards-requirements
+description: Documento de requisitos e diretrizes de desenvolvimento para o aplicativo de Flashcards para Estudo de Japonês. Este skill orienta a estrutura, design e funcionalidades do SPA de flashcards.
+---
+
 # Aplicativo de Flashcards para Estudo de Japonês - Documento de Requisitos
 
-##1. Informações Básicas
+## 1. Informações Básicas
 
 ### 1.1 Nome do Aplicativo
-\n日本語 Flashcards
+日本語 Flashcards
 
 ### 1.2 Descrição do Aplicativo
 
@@ -44,7 +49,7 @@ Aplicativo SPA (Single Page Application) para estudo da língua japonesa atravé
 - Alternar visualização entre Kanji, Hiragana, Rômaji e Português através de botões
 - Função 'Misturar' para embaralhar ordem dos cards
 - Função 'Reiniciar' para voltar ao início do deck
-- Botão 'Ouvir' com TTS (Text-to-Speech) utilizando sempre o texto do campo hiragana/katakana
+- Botão 'Ouvir' com TTS (Text-to-Speech) utilizando sempre o texto do campo selecionado em "Configurações de Voz"
 - Barra de progresso visual do estudo
 
 ### 2.5 Importação e Exportação
@@ -63,6 +68,7 @@ Aplicativo SPA (Single Page Application) para estudo da língua japonesa atravé
 - Seleção de voz para TTS (ex: Microsoft Haruka - Japanese)
 - Ajuste de velocidade de reprodução (lento a rápido)
 - Ajuste de tom de voz (grave a agudo)
+- Seleção do campo a ser lido (Kanji, Hiragana, Rômaji, Português)
 
 ### 2.7 Medidor de espaço disponível
 

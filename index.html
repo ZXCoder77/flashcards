@@ -875,6 +875,16 @@
               <select class="form-select" id="voiceSelect" onchange="updateVoiceSettings()"></select>
             </div>
 
+            <div class="form-group">
+              <label class="form-label">Campo para Leitura</label>
+              <select class="form-select" id="ttsFieldSelect" onchange="updateTtsField()">
+                <option value="kanji">Kanji</option>
+                <option value="hiragana">Hiragana / Katakana</option>
+                <option value="romaji">Rômaji</option>
+                <option value="portuguese">Português</option>
+              </select>
+            </div>
+
             <div class="slider-container">
               <div class="slider-header">
                 <label class="form-label">Velocidade</label>
@@ -1043,7 +1053,7 @@
   </div>
 
   <script>
-    let version = '1.0.36';
+    let version = '1.0.37';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
@@ -1056,7 +1066,8 @@
       voiceSettings: {
         voiceURI: '',
         rate: 1,
-        pitch: 1
+        pitch: 1,
+        ttsField: 'kanji'
       },
       currentView: 'home',
       currentGroupId: null,
@@ -1083,7 +1094,8 @@
           const data = JSON.parse(stored);
           appState.groups = data.groups || [];
           appState.decks = data.decks || [];
-          appState.voiceSettings = data.voiceSettings || { voiceURI: '', rate: 1, pitch: 1 };
+          appState.voiceSettings = data.voiceSettings || { voiceURI: '', rate: 1, pitch: 1, ttsField: 'kanji' };
+          if (!appState.voiceSettings.ttsField) appState.voiceSettings.ttsField = 'kanji';
         }
       } catch (error) {
         console.error('Erro ao carregar dados:', error);
@@ -1498,6 +1510,11 @@
       document.getElementById('rateValue').textContent = appState.voiceSettings.rate + 'x';
       document.getElementById('pitchSlider').value = appState.voiceSettings.pitch;
       document.getElementById('pitchValue').textContent = appState.voiceSettings.pitch;
+
+      const ttsFieldSelect = document.getElementById('ttsFieldSelect');
+      if (ttsFieldSelect && appState.voiceSettings.ttsField) {
+        ttsFieldSelect.value = appState.voiceSettings.ttsField;
+      }
     }
 
     if (window.speechSynthesis) {
@@ -1508,7 +1525,8 @@
       if (!appState.studyCards || appState.studyCards.length === 0) return;
 
       const card = appState.studyCards[appState.currentCardIndex];
-      const text = card.hiragana;
+      const field = appState.voiceSettings.ttsField || 'kanji';
+      const text = card[field] || card.kanji;
 
       window.speechSynthesis.cancel();
 
@@ -1529,6 +1547,11 @@
 
     function updateVoiceSettings() {
       appState.voiceSettings.voiceURI = document.getElementById('voiceSelect').value;
+      saveData();
+    }
+
+    function updateTtsField() {
+      appState.voiceSettings.ttsField = document.getElementById('ttsFieldSelect').value;
       saveData();
     }
 
