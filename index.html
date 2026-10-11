@@ -1053,7 +1053,7 @@
   </div>
 
   <script>
-    let version = '1.0.37';
+    let version = '1.0.38';
     // atualiza o texto dos elementos que possui as class header e version
     document.querySelectorAll('.header .version').forEach(element => {
       element.textContent = 'versão ' + version;
@@ -1116,6 +1116,103 @@
         console.error('Erro ao salvar dados:', error);
         showToast('Erro ao salvar dados', 'error');
       }
+    }
+
+    // Dados de exemplo inicial
+    function getSampleCards() {
+      return [
+        {
+          id: generateId(),
+          kanji: 'りんごを食べます。',
+          hiragana: 'りんごをたべます。',
+          romaji: 'Ringo o tabemasu.',
+          portuguese: 'Eu como maçã.'
+        },
+        {
+          id: generateId(),
+          kanji: 'パンを食べました。',
+          hiragana: 'パンをたべました。',
+          romaji: 'Pan o tabemashita.',
+          portuguese: 'Eu comi pão.'
+        },
+        {
+          id: generateId(),
+          kanji: '学校へ行きます。',
+          hiragana: 'がっこうへいきます。',
+          romaji: 'Gakkou e ikimasu.',
+          portuguese: 'Eu vou para a escola.'
+        },
+        {
+          id: generateId(),
+          kanji: '東京へ行きました。',
+          hiragana: 'とうきょうへいきました。',
+          romaji: 'Toukyou e ikimashita.',
+          portuguese: 'Eu fui para Tóquio.'
+        },
+        {
+          id: generateId(),
+          kanji: '本を買います。',
+          hiragana: 'ほんをかいます。',
+          romaji: 'Hon o kaimasu.',
+          portuguese: 'Eu compro um livro.'
+        },
+        {
+          id: generateId(),
+          kanji: 'お茶を買いました。',
+          hiragana: 'おちゃをかいました。',
+          romaji: 'Ocha o kaimashita.',
+          portuguese: 'Eu comprei chá.'
+        }
+      ];
+    }
+
+    function loadSampleData() {
+      const now = new Date().toISOString();
+      const groupId = generateId();
+      const deckId = generateId();
+
+      const sampleGroup = {
+        id: groupId,
+        name: 'Exemplo - Verbos Básicos',
+        description: 'Grupo com frases básicas para começar seus estudos',
+        createdAt: now,
+        updatedAt: now
+      };
+
+      const sampleDeck = {
+        id: deckId,
+        name: 'Verbos: Comer, Ir e Comprar',
+        description: 'Frases simples com os verbos comer (食べる), ir (行く) e comprar (買う)',
+        groupId: groupId,
+        cards: getSampleCards(),
+        createdAt: now,
+        updatedAt: now
+      };
+
+      appState.groups.push(sampleGroup);
+      appState.decks.push(sampleDeck);
+      saveData();
+      renderGroupsList();
+      showToast('Grupo e deck de exemplo criados com sucesso!', 'success');
+    }
+
+    function loadSampleDeckIntoCurrentGroup() {
+      if (!appState.currentGroupId) return;
+      const now = new Date().toISOString();
+      const sampleDeck = {
+        id: generateId(),
+        name: 'Verbos: Comer, Ir e Comprar',
+        description: 'Frases simples com os verbos comer (食べる), ir (行く) e comprar (買う)',
+        groupId: appState.currentGroupId,
+        cards: getSampleCards(),
+        createdAt: now,
+        updatedAt: now
+      };
+
+      appState.decks.push(sampleDeck);
+      saveData();
+      renderDecksList();
+      showToast('Deck de exemplo criado com sucesso!', 'success');
     }
 
     // Funções de armazenamento
@@ -1248,7 +1345,15 @@
             <div class="empty-state">
               <div class="empty-state-icon">📁</div>
               <p class="empty-state-title">Nenhum grupo criado</p>
-              <p class="empty-state-description">Crie seu primeiro grupo para começar</p>
+              <p class="empty-state-description">Crie seu primeiro grupo para começar ou adicione um exemplo com frases comuns</p>
+              <div style="margin-top: 20px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                <button class="btn" onclick="openCreateGroupModal()">
+                  ➕ Novo Grupo
+                </button>
+                <button class="btn btn-outline" onclick="loadSampleData()">
+                  ✨ Adicionar Exemplo Inicial
+                </button>
+              </div>
             </div>
           </div>
         `;
@@ -1304,7 +1409,15 @@
             <div class="empty-state">
               <div class="empty-state-icon">📚</div>
               <p class="empty-state-title">Nenhum deck criado</p>
-              <p class="empty-state-description">Crie seu primeiro deck para começar a estudar</p>
+              <p class="empty-state-description">Crie seu primeiro deck para começar a estudar ou adicione o deck de exemplo</p>
+              <div style="margin-top: 20px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                <button class="btn" onclick="openCreateDeckModal()">
+                  ➕ Novo Deck
+                </button>
+                <button class="btn btn-outline" onclick="loadSampleDeckIntoCurrentGroup()">
+                  ✨ Adicionar Deck de Exemplo
+                </button>
+              </div>
             </div>
           </div>
         `;

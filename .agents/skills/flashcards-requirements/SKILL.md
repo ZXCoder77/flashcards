@@ -12,7 +12,7 @@ description: Documento de requisitos e diretrizes de desenvolvimento para o apli
 
 ### 1.2 Descrição do Aplicativo
 
-Aplicativo SPA (Single Page Application) para estudo da língua japonesa através de flashcards, desenvolvido com HTML, CSS e JavaScript puro, sem dependências externas. Funciona diretamente no navegador e permite salvar dados localmente em formato JSON.
+Aplicativo SPA (Single Page Application) e PWA (Progressive Web App) instalável para estudo da língua japonesa através de flashcards, desenvolvido com HTML, CSS e JavaScript puro, sem dependências externas. Funciona diretamente no navegador ou instalado no dispositivo, com suporte offline completo e salvamento de dados localmente em formato JSON.
 
 ## 2. Funcionalidades Principais
 
@@ -23,6 +23,7 @@ Aplicativo SPA (Single Page Application) para estudo da língua japonesa atravé
 - Excluir grupos (com confirmação)
 - Visualizar lista de grupos organizados
 - Importar deck para dentro de um grupo existente
+- Adicionar grupo e deck de exemplo inicial na tela de estado vazio (Empty State)
 
 ### 2.2 Gerenciamento de Decks
 
@@ -31,6 +32,7 @@ Aplicativo SPA (Single Page Application) para estudo da língua japonesa atravé
 - Excluir decks (com confirmação)
 - Organizar decks em grupos
 - Voltar para lista de decks
+- Deck de exemplo inicial com frases dos verbos comer (食べる), ir (行く) e comprar (買う)
 
 ### 2.3 Gerenciamento de Cards
 
@@ -75,6 +77,14 @@ Aplicativo SPA (Single Page Application) para estudo da língua japonesa atravé
 - Medir espaço disponível na pasta local
 - Exibir mensagem de alerta quando espaço insuficiente
 
+### 2.8 Recursos de PWA (Progressive Web App)
+
+- Instalação no dispositivo (desktop e mobile) com modo de exibição standalone
+- Funcionamento offline completo por meio de Service Worker e Cache Storage
+- Detecção automática de atualizações (verificação periódica de hora em hora e em evento de visibilidade)
+- Notificação em tela (toast) quando uma nova versão da aplicação estiver disponível
+- Ação de atualização imediata (botão "Atualizar") acionando `SKIP_WAITING` e recarregamento da aplicação
+
 ## 3. Estrutura de Dados
 
 ### 3.1 Formato JSON dos Cards
@@ -91,7 +101,7 @@ Cada card contém:
 - Estrutura hierárquica: Grupos > Decks > Cards
 - Persistência em pasta local do dispositivo
 
-## 4. Interfacedo Usuário
+## 4. Interface do Usuário
 
 ### 4.1 Referência Visual
 
@@ -107,6 +117,8 @@ Utilizar o modelo das imagens flashcards.png como base para o layout da interfac
 - Controles de navegação: Anterior, Próximo, Ouvir
 - Painel de configurações de voz (expansível)
 - Medidor de espaço disponível (expansível)
+- Notificação de nova versão (toast de atualização PWA com botão Atualizar)
+- Botões de ação no estado vazio (Empty State) para criação e carregamento de grupo/deck de exemplo
 
 ## 5. Estilo de Design
 
@@ -118,12 +130,16 @@ Utilizar o modelo das imagens flashcards.png como base para o layout da interfac
 
 ## 6. Requisitos Técnicos
 
-- Tipo: SPA (Single Page Application)
+- Tipo: SPA (Single Page Application) e PWA (Progressive Web App)
 - Tecnologias: HTML5, CSS3, JavaScript puro
 - Sem frameworks ou bibliotecas externas
 - Compatível com navegadores modernos (Chrome, Firefox, Safari, Edge)
-- Funcionalidade offline após carregamento inicial
+- Suporte offline completo após carregamento inicial via Service Worker
+- Arquitetura de arquivos PWA:
+  - `index.html`: aplicação principal (SPA com CSS e JavaScript embutidos)
+  - `manifest.json`: manifesto PWA (nome, tema #3498db, fundo #f5e6d3, modo `standalone` e ícones)
+  - `sw.js`: Service Worker gerenciando cache estático (Cache Storage) e ciclo de vida de atualização com `SKIP_WAITING`
+  - `icon-192.png` e `icon-512.png`: ícones da aplicação para desktop e mobile
 - API Web Speech para TTS
 - File System Access API para importação/exportação de arquivos
 - Não utilizar Node.js
-- Gerar apenas um arquivo flashcards.html (standalone html)
